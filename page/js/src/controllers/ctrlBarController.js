@@ -290,7 +290,10 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 				
 				$scope.containerRawBoxForm.basicSettings.$setPristine();
 				$('#boxModal').modal('hide');
-			}	
+			},
+			availableBoxes: function(){
+				$('#availableBoxesModal').modal('hide');
+			}
 		}
 	};
 

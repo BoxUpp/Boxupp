@@ -11,7 +11,7 @@
 				<div class="text-center sadFace" ng-show="boxesData.length === 0">
 					<span><i class="fa fa-meh-o"></i></span>
 				</div>
-				<ul class="nav nav-pills nav-stacked secondaryNavList" ng-hide="boxesData.length === 0">
+				<ul id="step5" class="nav nav-pills nav-stacked secondaryNavList" ng-hide="boxesData.length === 0">
 				  	<li ng-repeat="box in boxesData">
 						<a data-target="#" ng-click="selectNode(box); $root.expandedCtrlBar = false;" role="tab" data-toggle="tab">
 							<div class="main-nav-icon"><i class="fa fa-cube"></i></div>

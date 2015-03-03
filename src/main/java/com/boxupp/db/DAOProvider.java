@@ -20,8 +20,9 @@ import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.boxupp.db.beans.AvailableBoxesBean;
 import com.boxupp.db.beans.MachineConfigurationBean;
-import com.boxupp.db.beans.MachineProjectMapping;
+import com.boxupp.db.beans.BoxBean;
 import com.boxupp.db.beans.ProjectBean;
 import com.boxupp.db.beans.ProviderBean;
 import com.boxupp.db.beans.ShellScriptBean;
@@ -84,10 +85,10 @@ public class DAOProvider {
 		}
 		return machineConfigDao;
 	} 
-	public Dao<MachineProjectMapping,Integer> fetchMachineMappingDao(){
-		Dao<MachineProjectMapping, Integer> machineMappingDao = null;
+	public Dao<BoxBean,Integer> fetchMachineMappingDao(){
+		Dao<BoxBean, Integer> machineMappingDao = null;
 		try{
-			machineMappingDao = DaoManager.createDao(DBConnectionManager.getInstance().fetchDBConnection(), MachineProjectMapping.class);
+			machineMappingDao = DaoManager.createDao(DBConnectionManager.getInstance().fetchDBConnection(), BoxBean.class);
 		}catch(SQLException e){
 			logger.error("Error initializing DAO access object for MachineMapping.class : "+e.getMessage());
 		}
@@ -114,4 +115,16 @@ public class DAOProvider {
 		}
 		return shellScriptMappingDao;
 	}
+	// new addition
+	 public Dao<AvailableBoxesBean,Integer> fetchAvailableBoxesDao(){
+		Dao<AvailableBoxesBean, Integer> availableBoxesDao = null;
+		try{
+			availableBoxesDao = DaoManager.createDao(DBConnectionManager.getInstance().fetchDBConnection(), AvailableBoxesBean.class);
+		}catch(SQLException e){
+			logger.error("Error initializing DAO access object for AvailableBoxesBean.class : "+e.getMessage());
+		}
+		//return availableBoxesDao.queryForAll().size();
+		return availableBoxesDao;
+	} 
+	 
 }

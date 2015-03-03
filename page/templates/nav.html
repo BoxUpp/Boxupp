@@ -1,5 +1,5 @@
 <header  class="navbar navbar-inverse navbar-fixed-top" id="topNavBar" role="navigation">
-	<div class="container-fluid">
+	<div id="step3" class="container-fluid">
 		<div class="navbar-header">
 		  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
 			<span class="sr-only">Toggle navigation</span>
@@ -8,7 +8,7 @@
 			<span class="icon-bar"></span>
 		  </button>
 		</div>
-		<div class="navbar-collapse collapse">
+		<div id="navbar" class="navbar-collapse collapse">
 
 			<ul class="nav navbar-nav navbar-left">
 				<li>
@@ -55,7 +55,7 @@
 					<!-- <button class="btn navbar-btn btn-sm btn-success" ng-click="deployEnvironment();"><i class="fa fa-rocket" style="margin-right: 5px; font-size: 15px;"></i>DEPLOY ALL</button> -->
 				</li>
 				<li>
-					<button class="btn navbar-btn btn-sm btn-success" ng-click="deployEnvironment();"><i class="fa fa-rocket" style="margin-right: 5px; font-size: 15px;"></i>DEPLOY ALL</button>
+					<button id="step15" class="btn navbar-btn btn-sm btn-success" ng-click="deployEnvironment();"><i class="fa fa-rocket" style="margin-right: 5px; font-size: 15px;"></i>DEPLOY ALL</button>
 				</li>
 				<li> 
 					<a ng-click="switchWorkspace()">Switch Workspace</a>
@@ -87,6 +87,12 @@
 					<ul class="dropdown-menu">
 						<li>
 							<a class="helpNav" ng-click="userSignout()"><i class="fa fa-sign-out"></i>Signout</a>
+						</li>
+						<li>
+							<a class="helpNav" ng-click="startIntro(1)"><i class="fa fa-play-circle-o"></i>Boxupp Tour</a>
+						</li>
+						<li>
+							<a class="helpNav" href="https://github.com/BoxUpp/boxupp/issues/new" target="_blank"><i class="fa fa-bug"></i>Report an error</a>
 						</li>
 					</ul>
 				</li>

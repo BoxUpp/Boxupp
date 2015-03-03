@@ -15,7 +15,7 @@
  *******************************************************************************/
 var ngBoxuppApp = angular.module('boxuppApp');
 
-ngBoxuppApp.controller('projectInitController',function($scope,$routeParams,Providers,$location,$http,$timeout){
+ngBoxuppApp.controller('projectInitController',function($scope,$routeParams,Providers,$location,$http,$timeout,BoxUtilities){
 
 
     $scope.bodyStyle.applyDashBoardStyling = false;
@@ -54,6 +54,7 @@ ngBoxuppApp.controller('projectInitController',function($scope,$routeParams,Prov
       });*/
 
 	$scope.selectedProvider = Providers.get({id : $routeParams.providerType});
+
     
     // $scope.providerID = $routeParams.providerType;
     // $scope.selectedProvider = Providers.get({ id: $scope.providerID }, function() {

@@ -1,8 +1,8 @@
-<div class="mainNavElements col-md-2" style="position:absolute; top:51px; bottom:0px; overflow:hidden ">
+<div id="step2" class="mainNavElements col-md-2" style="position:absolute; top:51px; bottom:0px; overflow:hidden ">
 	<ul class="nav nav-pills nav-stacked mainNavList">
 
 		<li class="active">
-			<a data-target="#dashboardList , #dashboardPlayArea" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = true; $root.expandedCtrlBar = false;" ng-nit="$parent.collapseSecNav = true">
+			<a id="mainNavDashboard" data-target="#dashboardList , #dashboardPlayArea" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = true; $root.expandedCtrlBar = false;" ng-nit="$parent.collapseSecNav = true">
 						<div class="main-nav-icon"><i class="fa fa-desktop"></i></div>
 						<div class="main-nav-label">Dashboard</div>
 						<div class="main-nav-description"></div>
@@ -13,8 +13,8 @@
 				Manage
 			</div>
 		</li>
-	  	<li>
-	  		<a data-target="#boxesList, #boxesPlayArea, #boxTrash, #boxEdit" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = false; resetBoxInControlBar();">
+	  	<li >
+	  		<a id="step4" data-target="#boxesList, #boxesPlayArea, #boxTrash, #boxEdit" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = false; resetBoxInControlBar()">
 	  			<div class="main-nav-icon">
 	  				  <i class="fa fa-cubes"></i>
 	  			</div>
@@ -22,8 +22,9 @@
 				<div class="main-nav-description"></div>
 			</a>
 		</li>
+	  	
 	  	<li>
-	  		<a data-target="#scriptsList , #scriptsPlayArea, #scriptTrash, #scriptEdit" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = false; resetScriptInControlBar()">
+	  		<a id="step8" data-target="#scriptsList , #scriptsPlayArea, #scriptTrash, #scriptEdit" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = false; resetScriptInControlBar()">
 	  			<div class="main-nav-icon">
 	  				  <i class="fa fa-file-code-o"></i>
 	  			</div>
@@ -32,7 +33,7 @@
 			</a>
 		</li>
 	  	<li>
-	  		<a data-target="#modulesList , #modulesPlayArea, #moduleTrash, #moduleEdit" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = false; resetModuleInControlBar()">
+	  		<a id="step9" data-target="#modulesList , #modulesPlayArea, #moduleTrash, #moduleEdit" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = false; resetModuleInControlBar()">
 	  			<div class="main-nav-icon">
 	  				  <i class="fa fa-gears"></i>
 	  			</div>
@@ -40,20 +41,21 @@
 				<div class="main-nav-description"></div>
 			</a>
 		</li>
+		
 		<li class="sectionTitle">
 			<div class="sectionTitleText">
 				Provision
 			</div>
 		</li>
 		<li ng-mouseenter="shellHover = true" ng-mouseleave = "shellHover = false" ng-init="shellHover = false">
-			<a data-target="#shellProvPlayArea, #scriptsProvList" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = true; $root.expandedCtrlBar = false;">
+			<a id="step10" data-target="#shellProvPlayArea, #scriptsProvList" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = true; $root.expandedCtrlBar = false;">
 				<div class="main-nav-icon"><i class="fa fa-cog" ng-class="{'fa-spin' : shellHover}"></i></div>
 				<div class="main-nav-label">Shell Provisioner</div>
 				<div class="main-nav-description"></div>
 			</a>
 		</li>
 		<li ng-mouseenter="puppetHover = true" ng-mouseleave = "puppetHover = false" ng-init="puppetHover = false">
-			<a data-target="#puppetProvPlayArea, #modulesProvList" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = true; $root.expandedCtrlBar = false;">
+			<a id="step13" data-target="#puppetProvPlayArea, #modulesProvList" role="tab" data-toggle="tab" ng-click="$parent.collapseSecNav = true; $root.expandedCtrlBar = false;">
 				<div class="main-nav-icon"><i class="fa fa-cog" ng-class="{'fa-spin' : puppetHover}"></i></div>
 				<div class="main-nav-label">Puppet Provisioner</div>
 				<div class="main-nav-description"></div>
@@ -65,7 +67,7 @@
 			</div>
 		</li>
 		<li>
-			<a data-target="#gitModal" data-toggle="modal" ng-click="$root.expandedCtrlBar = false;">
+			<a id="step14" data-target="#gitModal" data-toggle="modal" ng-click="$root.expandedCtrlBar = false;">
 				<div class="main-nav-icon"><i class="fa fa-github"></i></div>
 				<div class="main-nav-label">Github</div>
 				<div class="main-nav-description"></div>

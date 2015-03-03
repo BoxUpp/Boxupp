@@ -38,6 +38,7 @@
 <script>document.write('<script src="js/ui-codemirror.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
 <!--<script>document.write('<script src="js/boxupp.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>-->
 <script src="js/boxupp.js"></script>
+<script src="js/boxUtilities.js"></script>
       
 <!--<script>document.write('<script src="js/factoryCtrl.min.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>-->
 <script src="js/factoryCtrl.min.js"></script>
@@ -73,6 +74,9 @@
 <script src="js/angular-route.min.js"></script>
 <script src="js/gitController.js"></script>
 <script src="js/src/directives/boxuppDirectives.js"></script>
+<script src="js/intro.js"></script>
+
+<script src="js/angular-cookies.js"></script>
 
 
 
@@ -96,10 +100,12 @@
 
 </head>
 
-<body ng-controller="boxuppAppController" ng-class="{'dashBoardStyling' : bodyStyle.applyDashBoardStyling}" style="/*background:cadetblue;*/ position:fixed; top:0px; bottom:0px; left:0px; right:0px;" ng-init="bodyStyle.applyDashBoardStyling = false;">
-	
-	<div class="ng-view">
-	
+<body ng-controller="boxuppAppController" ng-class="{'dashBoardStyling' : bodyStyle.applyDashBoardStyling}" style="/*background:cadetblue;*/ position:fixed; top:0px; bottom:0px; left:0px; right:0px;" ng-init="bodyStyle.applyDashBoardStyling = false;" >
+	<div class="ng-view" ng-intro-options="IntroOptions" ng-intro-method="startIntro" ng-intro-oncomplete="CompletedEvent" ng-intro-onexit="ExitEvent"
+		     ng-intro-onchange="ChangeEvent" ng-intro-onbeforechange="BeforeChangeEvent"
+		     ng-intro-onafterchange="AfterChangeEvent"
+		     ng-intro-autostart="ShouldAutoStart()">
+
 	</div>
 <script>document.write('<script src="js/shell.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
 <script>document.write('<script src="js/miscellaneous.js?dev=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
