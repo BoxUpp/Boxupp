@@ -15,7 +15,7 @@
  *******************************************************************************/
 var ngBoxuppApp = angular.module('boxuppApp');
 
-ngBoxuppApp.controller('loginController',function($scope,$http,$location,User,$routeParams,BoxUtilities,$rootScope){
+ngBoxuppApp.controller('loginController',function($scope,$http,$location,User,$routeParams){
 
 	/*$scope.loginCredentials = {
 			loginId : '',
@@ -58,9 +58,6 @@ ngBoxuppApp.controller('loginController',function($scope,$http,$location,User,$r
 						$scope.checkLogin = false;
 						$location.path("/" + data.userID + "/projects/");
 						ga('send', 'event', 'v1.0.0', 'login',lc.loginID);
-						//check for new boxes and fetch them
-						//AvailableBoxes.checkForNewBoxes();
-						//BoxUtilities.getAvailableBoxesList();
 					}else{
 						$scope.authError = true;
 						$scope.checkLogin = false;
