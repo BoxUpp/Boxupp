@@ -15,7 +15,7 @@
  *******************************************************************************/
 var ngBoxuppApp = angular.module('boxuppApp');
 
-ngBoxuppApp.controller('projectInitController',function($scope,$routeParams,Providers,$location,$http,$timeout,BoxUtilities){
+ngBoxuppApp.controller('projectInitController',function($scope,$routeParams,Providers,$location,$http,$timeout){
 
 
     $scope.bodyStyle.applyDashBoardStyling = false;
