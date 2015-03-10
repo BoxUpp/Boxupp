@@ -14,7 +14,7 @@
  *  limitations under the License.
  *******************************************************************************/
 
-angular.module('boxuppApp').controller('vboxController',function($scope,$interval,$q,$http,$rootScope,$routeParams,$filter,$timeout,MachineConfig,ResourcesData,vagrantStatus,executeCommand,retrieveMappings,puppetModule,miscUtil,shellScript,provider,User,$location,puppetModuleResource, boxFunctionality, loggerFunctionality,BoxUtilities){
+angular.module('boxuppApp').controller('vboxController',function($scope,$interval,$q,$http,$rootScope,$routeParams,$filter,$timeout,MachineConfig,ResourcesData,vagrantStatus,executeCommand,retrieveMappings,puppetModule,miscUtil,shellScript,provider,User,$location,puppetModuleResource, boxFunctionality, loggerFunctionality,BoxUtilities,Notification){
 
 	$scope.projectData = {
 		boxesState : {
@@ -429,6 +429,8 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 				});
 				$scope.activeVM = null;
 				$scope.disableDeleteButton= false;
+				Notification.primary('Box has been deleted..');
+
 			});
 		}else{
 			alert('cannot be deleted');

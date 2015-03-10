@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *******************************************************************************/
-angular.module('boxuppApp').controller('ctrlBarController',function($scope,shellScript,$routeParams,miscUtil,MachineConfig){
+angular.module('boxuppApp').controller('ctrlBarController',function($scope,shellScript,$routeParams,miscUtil,MachineConfig,Notification){
 
 	
 
@@ -129,7 +129,9 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 			$scope.quickBoxForm.$setPristine();
 			$scope.deployBox(data.beanData);
 		});
-		$scope.quickBoxCommitLoader = false;	
+		$scope.quickBoxCommitLoader = false;
+		Notification.primary('Box has been created..');
+
 	}
 	$scope.createContainerQuickBox = function(boxData){
 		
