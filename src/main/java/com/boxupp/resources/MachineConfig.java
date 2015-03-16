@@ -73,4 +73,13 @@ public class MachineConfig {
 	public StatusBean reloadMachine(JsonNode machineData) {
 		return MachineConfigDAOManager.getInstance().reload(machineData.get("machineID").toString());
 	}
+	
+	@POST
+	@Path("/updateMachineMappingWithPuppet")
+	@Produces(MediaType.APPLICATION_JSON)
+	public StatusBean updatePuppetConfigForMachine(JsonNode updatedMachineMapping) {
+		return MachineConfigDAOManager.getInstance().updatePuppetMasterMapping(updatedMachineMapping);
+	}
+	
+	
 }

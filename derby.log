@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Wed Mar 04 13:27:59 IST 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-014b-e3ca-95ed-000007a8c010 
+on database directory /home/asha/Boxupp/db with class loader java.net.URLClassLoader@50058560 
+Loaded from file:/home/asha/.m2/repository/org/apache/derby/derby/10.11.1.1/derby-10.11.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_65-b32
+user.dir=/home/asha/boxuppGit/boxupp
+os.name=Linux
+os.arch=amd64
+os.version=3.2.0-23-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

@@ -30,12 +30,13 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 
 public class MailManager {
-	private static String apiKey = "key-";
+	private static String apiKey = "key-c6ff792c4302a87dde14906beea6d8cb";
 	private static String webResourceURL = "https://api.mailgun.net/v2/support.boxupp.com/messages";
 	
 	public ClientResponse sendRegistrationMail(String emailID, String name, String password){
 		Client client = Client.create();
-	    client.addFilter(new HTTPBasicAuthFilter("api","key-"));
+	    client.addFilter(new HTTPBasicAuthFilter(
+	        "api","key-c6ff792c4302a87dde14906beea6d8cb"));
 	    WebResource webResource = client.resource("https://api.mailgun.net/v2/support.boxupp.com/messages");
 	    MultivaluedMapImpl formData = new MultivaluedMapImpl();
 	    formData.add("from", "Boxupp Support <info@boxupp.com>");
@@ -61,9 +62,16 @@ public class MailManager {
 	    data = data.replaceAll("<PASSWORD>", password);
 	    data = data.replaceAll("<NAME>", name);
 	    formData.add("html", data);
-
+//	    formData.add("text","Welcome to Boxupp");
+//	    formData.add("o:campaign", "welcome");
+	    
 	    return webResource.type(MediaType.APPLICATION_FORM_URLENCODED).
 	        post(ClientResponse.class, formData);
+	}
+	
+	public static void main(String args[]) {
+		MailManager manager = new MailManager();
+		manager.sendRegistrationMail("akshay.kapoor@paxcel.net","Akshay","abc");
 	}
 
 }

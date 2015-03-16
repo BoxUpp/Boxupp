@@ -42,9 +42,13 @@
 									   	<input name="hostName" 
 										 ng-model="rawBox.hostName"
 										 type="text"
-									     class="form-control"
+									     class="form-control"  ng-change="checkValidity.hostName(rawBoxForm.basicSettings)"
 										 required>
-										    </div>
+										 <div ng-messages="rawBoxForm.basicSettings.$error" >
+								        	<div ng-message="alreadyExists" class="errorMessage">This HostName is already in use</div>
+								        	
+						            	</div>
+										</div>
 										    <div class="boxConfig">
 												<span class="boxConfigTitles">
 													Box Type<sup>*</sup>

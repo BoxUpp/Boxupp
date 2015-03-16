@@ -19,12 +19,14 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+
 import javax.ws.rs.core.MediaType;
 
 import org.codehaus.jackson.JsonNode;
@@ -42,6 +44,7 @@ public class User {
 	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
+
 	public UserAuthenticationResponse getLoginUserId(JsonNode loginCredentials,@Context HttpServletRequest request){
 		return LoginDAOManager.getInstance().loginAuthorization(loginCredentials,request);
 	}
@@ -79,5 +82,6 @@ public class User {
 		return SessionTracker.getInstance().isSessionActive(request);
 	}
 	
+
 
 }

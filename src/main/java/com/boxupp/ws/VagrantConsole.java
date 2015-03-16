@@ -16,6 +16,7 @@
 package com.boxupp.ws;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import com.boxupp.responseBeans.VagrantOutput;
+import com.boxupp.responseBeans.VagrantStatus;
 import com.boxupp.responseBeans.VagrantStreamError;
 import com.boxupp.responseBeans.VagrantStreamOutput;
 import com.boxupp.utilities.Utilities;
@@ -54,8 +56,10 @@ public class VagrantConsole implements OutputConsole{
 		Integer userID = Integer.parseInt(commands[1]);
 		command = commands[0];
         VagrantCommandProcessor shellProcessor = new VagrantCommandProcessor();
+//		String location = Utilities.getInstance().fetchActiveProjectDirectory(userID);
         String location = Utilities.getInstance().fetchActiveProjectDirectory(userID);
         if(command.toLowerCase(Locale.ENGLISH).indexOf("vagrant")!= -1 ){
+//			shellProcessor.executeVagrantFile(location,command,userID, this);
         	shellProcessor.executeVagrantFile(location,command,userID, this);
 		}else{
 			this.pushError("Not a valid Vagrant command");
@@ -109,5 +113,13 @@ public class VagrantConsole implements OutputConsole{
 			logger.error("Error committing output to console : "+e.getMessage());
 		}
 	}
+
+
+	@Override
+	public void pustOutPut(List<VagrantStatus> status) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

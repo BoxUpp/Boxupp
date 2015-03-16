@@ -17,6 +17,9 @@ Vagrant.configure("2") do |config|
 	#set ($providerMarker = ".vm.provider")
 	#set ($shellProvisionMarker = ".vm.provision")
 	#set ($childStructures = $boxuppConfig)
+	#set ($puppetServerMarker = ".puppet_server")
+	#set ($puppetNodeMarker = ".puppet_node")
+	#set ($puppetOptionMarker = ".options")
 
 	#foreach ($childBean in $childStructures)
 		#set($ports = [])
@@ -44,11 +47,23 @@ Vagrant.configure("2") do |config|
 				#if(!$portMappings.isEmpty())
 				d.ports=$ports
 				#end
-				#foreach ($dockerLinkContainer in $dockerLinkContainers)#foreach($box in $childStructures)#if( $dockerLinkContainer.linkedMachineID == $box.machineID)
+
+				#if($puppetMasterMachine)
+			
+					#if(!($puppetMasterMachine.vagrantID  == $childBean.vagrantID))
+					d.link("$puppetMasterMachine.vagrantID : $puppetMasterMachine.hostName")
+					#foreach ($dockerLinkContainer in $dockerLinkContainers)
+					#foreach($box in $childStructures)
+					#if( $dockerLinkContainer.linkedMachineID == $box.machineID)
+
 							d.link("$box.vagrantID : $box.hostName")
 						#end	
 					#end
 				#end
+
+				#end
+				#end
+
 			end
 			
 			$identifier$hostnameMarker = "$childBean.hostName"
@@ -62,12 +77,58 @@ Vagrant.configure("2") do |config|
 				#end
 			#end
 		
+			#if($puppetMasterMachine)
 			
-				$identifier$shellProvisionMarker "puppet" do |$identifier|
-					$identifier$manifestsPathMarker = "../manifests"
-					$identifier$manifestFilePathMarker = "../manifests/$nodeFile"
+				#if($puppetMasterMachine.vagrantID  == $childBean.vagrantID)
+				
+				
+
+					$identifier$syncFolderMarker "manifests", "/etc/puppet/manifests" 
+					$identifier$syncFolderMarker "../modules", "/etc/puppet/modules"
+					$identifier$shellProvisionMarker "shell" , path: "./scripts/puppetMaster.sh"
+					
+			#foreach ($innerChildBean in $childStructures)
+					#if($puppetMasterMachine.vagrantID  != $innerChildBean.vagrantID)
+						
+						$identifier$shellProvisionMarker "shell" , inline: "echo $innerChildBean.hostName >> /etc/puppet/autosign.conf"
+						
+						$identifier$shellProvisionMarker "shell" , inline: "/etc/init.d/puppetmaster start"
+					#end
+				#end
+					   $identifier$shellProvisionMarker  "puppet_server" do |$identifier|
+
+                       $identifier$puppetServerMarker = "$childBean.hostName"
+                       $identifier$puppetOptionMarker = "--verbose --debug"
+                	end		
+			#else
+
+				$identifier$shellProvisionMarker "shell" , path: "./scripts/puppetAgent.sh"
+	
+
+				     $identifier$shellProvisionMarker  "puppet_server" do |$identifier|
+				     #foreach ($innerChildBean in $childStructures)
+				     	#if($puppetMasterMachine.vagrantID  == $innerChildBean.vagrantID)
+                         $identifier$puppetServerMarker = "$innerChildBean.hostName"
+                         #end
+                      #end
+                         $identifier$puppetNodeMarker = "$childBean.hostName"
+
+                         $identifier$puppetOptionMarker = "--verbose --debug --waitforcert 60"
+
+                         end
+            		#end
+            #else
+
+           	 	$identifier$shellProvisionMarker "puppet" do |$identifier|
+					$identifier$manifestsPathMarker = "manifests"
+					$identifier$manifestFilePathMarker = "site.pp"
 					$identifier$modulePathMarker = "../modules"
-				end		
+				end	
+				
+
+			#end
+			
+					
 				
 	
 				#foreach ($scriptMapping in $scriptMappings)

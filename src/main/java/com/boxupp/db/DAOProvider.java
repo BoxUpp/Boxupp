@@ -114,4 +114,73 @@ public class DAOProvider {
 		}
 		return shellScriptMappingDao;
 	}
+	public static void main(String args[]) throws SQLException{
+		
+		//DELETE TABLES FROM DATABASE //
+//		TableUtils.dropTable(DBManager.getInstance().fetchDBConnection(), ProjectBean.class, false);
+//		TableUtils.dropTable(DBManager.getInstance().fetchDBConnection(), ProviderBean.class, false);
+		
+		//CREATE TABLES FROM DATABASE //
+//		TableUtils.createTable(DBManager.getInstance().fetchDBConnection(), ProjectBean.class);
+//		TableUtils.createTable(DBManager.getInstance().fetchDBConnection(), ProviderBean.class);
+		
+		//TableUtils.dropTable(DBManager.getInstance().fetchDBConnection(), ProviderBean.class, false);
+		// Create Provider 1 //
+		TableUtils.dropTable(DBConnectionManager.getInstance().fetchDBConnection(), ProjectBean.class, false);
+		//TableUtils.createTable(DBManager.getInstance().fetchDBConnection(), ProjectBean.class);
+		//TableUtils.dropTable(DBManager.getInstance().fetchDBConnection(), UserDetailBean.class, false);
+		//TableUtils.dropTable(DBManager.getInstance().fetchDBConnection(), UserProjectMapping.class, false);
+		//TableUtils.createTable(DBManager.getInstance().fetchDBConnection(), ProjectBean.class);
+		//TableUtils.createTable(DBManager.getInstance().fetchDBConnection(), ProviderBean.class);
+		//TableUtils.createTable(DBManager.getInstance().fetchDBConnection(), UserDetailBean.class);
+		//TableUtils.createTable(DBManager.getInstance().fetchDBConnection(), UserProjectMapping.class);
+		//TableUtils.createTableIfNotExists(DBManager.getInstance().fetchDBConnection(), UserProjectMapping.class);
+		//TableUtils.createTableIfNotExists(DBManager.getInstance().fetchDBConnection(), UserDetailBean.class);
+		TableUtils.createTable(DBConnectionManager.getInstance().fetchDBConnection(), ProviderBean.class);
+		//TableUtils.dropTable(DBManager.getInstance().fetchDBConnection(), ProviderBean.class, false);
+
+		ProviderBean providerBean = new ProviderBean();
+		providerBean.setDisabled(false);
+		providerBean.setName("Docker");
+		DAOProvider.getInstance().fetchDao(ProviderBean.class).create(providerBean);
+		
+		providerBean = new ProviderBean();
+		providerBean.setDisabled(false);
+		providerBean.setName("VirtualBox");
+		DAOProvider.getInstance().fetchProviderDao().create(providerBean);
+		
+	/*	UserDetailBean userDetailBean  = new UserDetailBean();
+		userDetailBean.setFirstName("boxupp");
+		userDetailBean.setLastName("tool");
+		userDetailBean.setIsDisabled(false);
+		userDetailBean.setMailId("boxupp@gmail.com");
+		userDetailBean.setPassword("boxupp");
+		userDetailBean.setUserType("admin");
+		DaoController.getInstance().fetchDao(UserDetailBean.class).create(userDetailBean);
+		List<UserDetailBean> userdata = DaoController.getInstance().fetchDao(UserDetailBean.class).queryBuilder().where().eq("mailId", "boxupp@gmail.com").and().eq("password", "boxupp").query();
+		System.out.println(userdata.get(0).getId());*/
+		
+		//Create Provider 2 //
+		
+		
+	/*	List<ProjectBean> projects = ProjectDBManager.getInstance().readAllDB();
+		for(ProjectBean project : projects){
+			System.out.println(project.getName());
+		}
+		Collection<ProjectBean> projectsCollection = projects;
+		UserProjectMapping userProjects = new UserProjectMapping();
+		userProjects.setUserId(1);
+		userProjects.setProjects(projectsCollection);
+		DaoController.getInstance().fetchDao(UserProjectMapping.class).create(userProjects);*/
+		/*List<UserProjectMapping> userProjects = DaoController.getInstance().fetchDao(UserProjectMapping.class).queryForAll();
+		for(UserProjectMapping user : userProjects){
+			System.out.println(user.getId());
+		}
+		
+		UserProjectMapping userpro = DaoController.getInstance().fetchDao(UserProjectMapping.class).queryForId(1);
+		for (ProjectBean project : userpro.getProjects()){
+			System.out.println(project.getName());
+		}*/
+		
+	}
 }

@@ -31,6 +31,7 @@ public class ProviderDAOManager implements DAOImplInterface {
 	private static Logger logger = LogManager.getLogger(ProjectDAOManager.class.getName());
 
 	public static Dao<ProviderBean, Integer> providerDao = null;
+//	protected static Dao<ProviderBean, Integer> providerMappingDao = null;
 	private static ProviderDAOManager providerDAOManager;
 	
 	public static ProviderDAOManager getInstance(){
@@ -42,9 +43,11 @@ public class ProviderDAOManager implements DAOImplInterface {
 	
 	private ProviderDAOManager() {
 		providerDao = DAOProvider.getInstance().fetchDao(ProviderBean.class);
+//		providerMappingDao = DAOProvider.getInstance().fetchDao(ProviderBean.class);
 	}
 	@Override
 	public StatusBean create(JsonNode newData) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -72,11 +75,13 @@ public class ProviderDAOManager implements DAOImplInterface {
 
 	@Override
 	public StatusBean update(JsonNode updatedData) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public StatusBean delete(String id) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

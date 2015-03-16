@@ -63,7 +63,7 @@ public class ConfigurationGenerator {
 			List<PuppetModuleBean> puppetModules,
 			List<ShellScriptBean> shellScripts,
 			List<ShellScriptMapping> scriptMappings,
-			List<PuppetModuleMapping> moduleMappings, String provider, String projectID){
+			List<PuppetModuleMapping> moduleMappings, String provider, String projectID, MachineConfigurationBean puppetMasterMachine){
 		
 		VelocityEngine ve = VelocityInit.getVelocityInstance();
 		Template template = VelocityInit.getTemplate(ve, provider);
@@ -74,6 +74,7 @@ public class ConfigurationGenerator {
 		context.put("moduleMappings", moduleMappings);
 		context.put("scriptMappings", scriptMappings);
 		context.put("nodeFile", projectID+".pp");
+		context.put("puppetMasterMachine", puppetMasterMachine );
 		
 		try{
 			StringWriter stringWriter = new StringWriter();

@@ -13,13 +13,36 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *******************************************************************************/
-angular.module("boxuppApp").controller('puppetController',function($scope,$rootScope,retrieveMappings,$timeout,validator,fileUpload,provision,$q){
+angular.module("boxuppApp").controller('puppetController',function($scope,$rootScope, $routeParams, retrieveMappings,$timeout,validator,fileUpload,provision,$q, boxFunctionality){
 
 		$scope.selectedProvMachine = {};
-		
-
+		$scope.selectedPuppetMaster = {}
+		$scope.isPuppetMaster= false;
+		$scope.puppetConfig = "";
 		$scope.checkProvState = function(){
 			return _.isEmpty($scope.moduleProvMappings);
+		}
+		$scope.setPuppetConfig = function(){
+
+			if($scope.puppetConfig === "puppetStandalone"){
+				$scope.isPuppetMaster= false;
+				var resetMachineMapping = {};
+				resetMachineMapping.projectID = $routeParams.projectID;
+			
+				 boxFunctionality.updateMachineMapping(resetMachineMapping).then(function(response, error){
+						if(response){
+
+							//deferred.resolve(response);
+							console.log('Machine Data Updated Succesfully : ');
+						}else{
+							//deferred.reject('Error in updating machine Mapping');
+
+						}
+					});
+			}else{
+				$scope.isPuppetMaster= true;
+
+			}
 		}
 
 		$scope.commitModulesProvisioning = function(){
@@ -99,7 +122,6 @@ angular.module("boxuppApp").controller('puppetController',function($scope,$rootS
 				});	
 			}
 		});
-
 		$scope.checkManifest = function(){
 			$scope.outputConsole.boxuppExecuting = true;
 			$scope.outputConsole.boxuppOutputWindow = true;
@@ -146,20 +168,7 @@ angular.module("boxuppApp").controller('puppetController',function($scope,$rootS
 		$scope.editedItem = null;
 		$rootScope.fileSelected = {"value":"change"};
 		
-		$scope.$watch('selectedPuppetMaster',function(newVal,oldVal){
-			if(typeof(newVal) !== 'undefined'){
-				var newMasterIndex;
-					for(var counter = 0; counter<$scope.boxesData.length; counter++){
-						$scope.boxesData[counter].isPuppetMaster = false;
-						if(_.isEqual(newVal,$scope.boxesData[counter])){
-							newMasterIndex = counter;
-						}
-					}
-				newVal.isPuppetMaster = true;
-				var masterObj = $scope.boxesData.splice(newMasterIndex,1);
-				$scope.boxesData.unshift(masterObj[0]);
-			}
-		},true);
+		$
 		
 		$scope.removeManifestFile = function(manifestFileIndex){
 			var fileName = $scope.puppet.manifests[manifestFileIndex].moFileName;

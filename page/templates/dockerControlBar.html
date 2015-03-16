@@ -35,7 +35,8 @@
 
 					<div class="tab-content">
 						<div class="trashIcon tab-pane fade" id="boxTrash">
-							<a class="pull-right" ng-click="deleteActiveBox()" ng-hide="activeVM === null">
+							<a class="pull-right" ng-click="deleteActiveBox()" ng-hide="activeVM === null ||activeVM.isPuppetMaster ">
+
 								<span ng-hide ="$root.expandedCtrlBar">
 									<i class="fa fa-trash-o"></i>
 								</span>
@@ -180,8 +181,12 @@
 								  	<div class="boxConfig"> <span class="boxConfigTitles">Host-Name<sup>*</sup></span>
 						              <input name="hostName" id="hostName" type="text"
 										ng-model="quickBox.hostName"
-										class="form-control"
+										class="form-control" ng-change="checkValidity.hostName(containerQuickBoxForm)"
 										required>
+										<div ng-messages="containerQuickBoxForm.hostName.$error" >
+								        	<div ng-message="alreadyExists" class="errorMessage">This HostName is already in use</div>
+								        	
+						            	</div>
 						            </div>
 									<div class="boxConfig"><span class="boxConfigTitles">Docker Image<sup>* </sup></span>
 										<select name="imageName" ng-model="quickBox.dockerImage" ng-options="image.path as image.path for image in listOfSSHImages" class="form-control" required>

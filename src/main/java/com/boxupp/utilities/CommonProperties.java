@@ -19,6 +19,7 @@ public class CommonProperties {
 	private static CommonProperties commonProperties = null;
 	private String dockerProvider = "Docker";
 	private String puppetForgeDownloadAPIPath = "https://forgeapi.puppetlabs.com:443";
+	private String remoteRepoClonePath = "/tmp/repo/boxupp";
 	
 	public static CommonProperties getInstance(){
 		if(commonProperties == null){
@@ -41,6 +42,14 @@ public class CommonProperties {
 
 	public void setDockerProvider(String dockerProvider) {
 		this.dockerProvider = dockerProvider;
+	}
+
+	public String getRemoteRepoClonePath() {
+		return remoteRepoClonePath;
+	}
+
+	public void setRemoteRepoClonePath(String remoteRepoClonePath) {
+		this.remoteRepoClonePath = remoteRepoClonePath;
 	}
 	
 	

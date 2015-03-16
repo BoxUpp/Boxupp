@@ -399,7 +399,7 @@ div.modal-content {
     overflow: auto;
     color: black; }
     div.modal-content div.modal-body div.projectLogo {
-      height: 200px;
+      height: 260px;
       border-right: 1px solid #eee;
       color: #71B1D1; }
       div.modal-content div.modal-body div.projectLogo i {
@@ -727,17 +727,30 @@ div.container-fluid .rowShadow
         
 .accordionStyle{
   clear: both;
-margin-top: 20px;
-float: left;
-width: 100%;
+  margin-top: 20px;
+  float: left;
+  width: 100%;
 }
 .loggerTitleBar{
   background: #71B1D1;
-margin: 5px 0;
-border-radius: 3px;
-padding: 10px 0;
-color: white;
+  margin: 5px 0;
+  border-radius: 3px;
+  padding: 10px 0;
+  color: white;
+}
+.loggerBarTextColor{
+  color: white !important;
+  font-size: 15px;
 }
 .datePicker label{
   padding-top: 6px;
+}
+.success{
+  background-color: #5cb85c !important;
+}
+.error{
+  background-color: #ea5c57 !important;
+}
+.logLineSeparator{
+   white-space: pre-line;
 }

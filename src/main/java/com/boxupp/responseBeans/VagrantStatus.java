@@ -23,6 +23,8 @@ public class VagrantStatus {
 	public int statusCode;  
 	public String vagrantStatusMessage;
 
+	public String vagrantID ;
+
 	public int getStatusCode() {
 		return statusCode;
 	}
@@ -38,4 +40,13 @@ public class VagrantStatus {
 	public void setVagrantStatus(String vagrantStatus) {
 		this.vagrantStatusMessage = vagrantStatus;
 	}
+
+	public String getVagrantID() {
+		return vagrantID;
+	}
+
+	public void setVagrantID(String vagrantID) {
+		this.vagrantID = vagrantID;
+	}
+
 }

@@ -17,6 +17,7 @@ package com.boxupp.dao;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,6 @@ import com.boxupp.db.beans.UserProjectMapping;
 import com.boxupp.responseBeans.StatusBean;
 import com.boxupp.utilities.CommonProperties;
 import com.boxupp.utilities.OSProperties;
-import com.boxupp.utilities.PuppetUtilities;
 import com.boxupp.utilities.Utilities;
 import com.boxupp.vagrant.VagrantCommandProcessor;
 import com.google.gson.Gson;
@@ -91,16 +91,36 @@ public class ProjectDAOManager implements DAOImplInterface {
 			statusBean.setData(projectBean);
 			Utilities.getInstance().initializeDirectory(projectBean.getProjectID());
 			
-			String nodeFileLoc = PuppetUtilities.getInstance().constructManifestsDirectory()+OSProperties.getInstance().getOSFileSeparator()+projectBean.getProjectID()+".pp";
+
+			String nodeFileLoc = Utilities.getInstance().constructProjectDirectory(projectBean.getProjectID())+OSProperties.getInstance().getOSFileSeparator()+OSProperties.getInstance().getManifestsDirName()+OSProperties.getInstance().getOSFileSeparator()+"site.pp";
 			boolean nodeFile =	new File(nodeFileLoc).createNewFile();
 			
+			
+
 			Integer providerID = ProviderDAOManager.getInstance().providerDao.queryForId(projectBean.getProviderType()).getProviderID();
 			ProjectProviderMappingBean projectProvider = new ProjectProviderMappingBean(projectBean.getProjectID(), providerID);
 			projectProviderMappingDao.create(projectProvider);
 			String providerName = ProviderDAOManager.getInstance().providerDao.queryForId(projectBean.getProviderType()).getName();
+
+			String scriptsDir = Utilities.getInstance().constructProjectDirectory(projectBean.getProjectID())+OSProperties.getInstance().getOSFileSeparator()
+					+OSProperties.getInstance().getScriptsDirName()+OSProperties.getInstance().getOSFileSeparator();
+			Utilities.getInstance().checkIfDirExists(new File(scriptsDir));
 			if(providerName.equalsIgnoreCase(CommonProperties.getInstance().getDockerProvider())){
 				Utilities.getInstance().initializeDockerVagrantFile(projectBean.getProjectID());
+				File puppetMasterScriptFile = new File (getClass().getResource("/dockerPuppetMaster.sh").toURI());
+				File puppetAgentScriptFile = new File(getClass().getResource("/dockerPuppetAgent.sh").toURI());
+				Utilities.getInstance().copyFile(puppetMasterScriptFile, new File(scriptsDir+"puppetMaster.sh"));
+				Utilities.getInstance().copyFile(puppetAgentScriptFile, new File(scriptsDir+"puppetAgent.sh"));
+			}else{
+				File puppetMasterScriptFile = new File (getClass().getResource("/puppetMaster.sh").toURI());
+				File puppetAgentScriptFile = new File(getClass().getResource("/puppetAgent.sh").toURI());
+				Utilities.getInstance().copyFile(puppetMasterScriptFile, new File(scriptsDir+"puppetMaster.sh"));
+				Utilities.getInstance().copyFile(puppetAgentScriptFile, new File(scriptsDir+"puppetAgent.sh"));
 			}
+			
+			
+			
+
 		} catch (SQLException e) {
 			logger.error("Error creating a new project : " + e.getMessage());
 			statusBean.setStatusCode(1);
@@ -109,6 +129,11 @@ public class ProjectDAOManager implements DAOImplInterface {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
 		}
 		return statusBean;
 	}
@@ -205,6 +230,28 @@ public class ProjectDAOManager implements DAOImplInterface {
 		return statusBean;
 	}
 
+	/*public StatusBean createMappedDB(JsonNode newData) {
+		ProjectBean projectBean = new ProjectBean();
+		Gson projectData = new GsonBuilder().setDateFormat(
+				"yyyy'-'MM'-'dd HH':'mm':'ss").create();
+		projectBean = projectData.fromJson(newData.toString(),
+				ProjectBean.class);
+		StatusBean statusBean = new StatusBean();
+		try {
+			int rowsUpdated = projectDao.create(projectBean);
+			// if(rowsUpdated == 1)
+			// Utilities.getInstance().changeActiveDirectory(projectBean.getProjectId());
+			UserDAOManager.getInstance().populateMappingBean(projectBean,
+					newData.get("owner").getValueAsText());
+			statusBean.setStatusCode(0);
+		} catch (SQLException e) {
+			logger.error("Error creating a new project : " + e.getMessage());
+			statusBean.setStatusCode(1);
+			statusBean.setStatusMessage("Error creating project : "+ e.getMessage());
+		}
+		return statusBean;
+	}*/
+
 	public <E> List<E> retireveProjectsForUser(String UserID) {
 		List<ProjectBean> projectList = new ArrayList<ProjectBean>();
 		try {
@@ -276,8 +323,10 @@ public class ProjectDAOManager implements DAOImplInterface {
 			ProjectBean project = projectDao.queryForId(Integer.parseInt(projectID));
 			List<ShellScriptBean> shellScripts = ShellScriptDAOManager.getInstance().shellScriptDao.queryForEq("isDisabled", false);
 			List<MachineConfigurationBean> machineConfigs = MachineConfigDAOManager.getInstance().machineConfigDao.queryForEq("isDisabled", false);
-			if(!(shellScripts.isEmpty())){
+			if(!shellScripts.isEmpty() && !machineConfigs.isEmpty()){
 				scriptMappingList = ShellScriptDAOManager.getInstance().shellScriptMappingDao.queryBuilder().where().in(ShellScriptMapping.SCRIPT_ID_FIELD_NAME, shellScripts).and().in(ShellScriptMapping.MACHINE_ID_FIELD_NAME, machineConfigs).and().eq(ShellScriptMapping.PROJECT_ID_FIELD_NAME, project).query();
+			}else if(!shellScripts.isEmpty()){
+				scriptMappingList = ShellScriptDAOManager.getInstance().shellScriptMappingDao.queryBuilder().where().in(ShellScriptMapping.SCRIPT_ID_FIELD_NAME, shellScripts).and().eq(ShellScriptMapping.PROJECT_ID_FIELD_NAME, project).query();
 			}
 			//scriptMappingList = ShellScriptDAOManager.getInstance().shellScriptMappingDao.queryForAll();
 		} catch (SQLException e) {
@@ -292,9 +341,20 @@ public class ProjectDAOManager implements DAOImplInterface {
 			ProjectBean project = projectDao.queryForId(Integer.parseInt(projectID));
 			List<PuppetModuleBean> puppetModules = PuppetModuleDAOManager.getInstance().puppetModuleDao.queryForEq("isDisabled", false);
 			List<MachineConfigurationBean> machineConfigs = MachineConfigDAOManager.getInstance().machineConfigDao.queryForEq("isDisabled", false);
-			if(!(puppetModules.isEmpty())){
+			if(!puppetModules.isEmpty() && !machineConfigs.isEmpty()){
 				moduleMappingList = PuppetModuleDAOManager.getInstance().puppetModuleMappingDao.queryBuilder().where().in(PuppetModuleMapping.MODULE_ID_FIELD_NAME, puppetModules).and().in(PuppetModuleMapping.MACHINE_ID_FIELD_NAME, machineConfigs).and().eq(ShellScriptMapping.PROJECT_ID_FIELD_NAME, project).query();
+			}else if(!puppetModules.isEmpty()){
+				moduleMappingList = PuppetModuleDAOManager.getInstance().puppetModuleMappingDao.queryBuilder().where().in(PuppetModuleMapping.MODULE_ID_FIELD_NAME, puppetModules).and().eq(ShellScriptMapping.PROJECT_ID_FIELD_NAME, project).query();
+
 			}
+			/*ProjectBean project = ProjectDAOManager.projectDao.queryForId(Integer.parseInt(projectID));
+			moduleMappingList = PuppetModuleDAOManager.getInstance().puppetModuleMappingDao.queryForAll();
+			for(PuppetModuleMapping mapping : moduleMappingList){
+				MachineConfigDAOManager.getInstance().machineConfigDao.refresh(mapping.getMachineConfig());
+				PuppetModuleDAOManager.getInstance().puppetModuleDao.refresh(mapping.getPuppetModule());
+			}
+			 moduleMappingList = PuppetModuleDAOManager.getInstance().puppetModuleMappingDao.queryForEq(PuppetModuleMapping.PROJECT_ID_FIELD_NAME, project);
+*/
 		} catch (SQLException e) {
 			logger.error("Error in retireving module mapping: "	+ e.getMessage());
 		}

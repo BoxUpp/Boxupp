@@ -15,6 +15,9 @@
  *******************************************************************************/
 package com.boxupp.vagrant;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.boxupp.responseBeans.VagrantStatus;
 
 public class VagrantCommandParser {
@@ -44,5 +47,38 @@ public class VagrantCommandParser {
 			statusBean.setVagrantStatus("Vagrant environment not running");
 		}
 		return statusBean;
+	}
+	public List<VagrantStatus> parseVagrantStatus(StringBuffer cmdOutput){
+		String[] lines = cmdOutput.toString().split(System.getProperty("line.separator"));
+		List<VagrantStatus> statusList = new ArrayList<VagrantStatus>();
+		for(String line: lines){
+			VagrantStatus statusBean = new VagrantStatus();
+			String output = line;
+			String vagrantFileNotPresent = "vagrant init";
+			String vagrantEnvUninitialized = "not created";
+			String vagrantEnvRunning = "running";
+			String vagrantEnvOff = "poweroff";
+			/* Case for 'vagrant init' will probably not occur ever */
+			if(output.indexOf(vagrantFileNotPresent) != -1){
+				statusBean.setStatusCode(3);
+				statusBean.setVagrantStatus("Vagrant file not present");
+			} 
+			else if(output.indexOf(vagrantEnvUninitialized) != -1){
+				statusBean.setStatusCode(3);
+				statusBean.setVagrantStatus("Vagrant file present but uninitialized");
+			}
+			else if(output.indexOf(vagrantEnvRunning) != -1){
+				statusBean.setStatusCode(1);
+				statusBean.setVagrantStatus("Vagrant environment running");
+				statusBean.setVagrantID(line.split("\\s+")[0]);
+			}
+			else if(output.indexOf(vagrantEnvOff) != -1){
+				statusBean.setStatusCode(0);
+				statusBean.setVagrantStatus("Vagrant environment not running");
+				statusBean.setVagrantID(line.split("\\s+")[0]);
+			}
+			statusList.add(statusBean);
+		}
+		return statusList;
 	}
 }

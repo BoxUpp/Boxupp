@@ -36,6 +36,9 @@ public class CreateDB {
 		
 			ConnectionSource connectionSource = new JdbcConnectionSource(DerbyConfig.JDBC_URL);
 			Dao<ProjectBean, Integer> projectDao = DaoManager.createDao(connectionSource, ProjectBean.class);
+//			ProjectBean bean = new ProjectBean("Trial","Akshay");
+//			bean.setCreationTime(Date.valueOf("2014-09-17"));
+//			projectDao.create(bean);
 			connectionSource.close();
 			TableUtils.createTable(connectionSource, ProjectBean.class);
 		

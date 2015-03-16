@@ -96,6 +96,7 @@ public class DBConnectionManager {
 			classList.add(MachineConfigurationBean.class);
 			classList.add(MachineProjectMapping.class);
 			classList.add(GitRepoBean.class);
+			//classList.add(LocalGitRepoBean.class);
 				
 			for(Class className : classList){
 				createTableIfNotExists(className);
@@ -153,6 +154,7 @@ public class DBConnectionManager {
 			logger.error("Error committing provider2 data to database");
 			return false;
 		}
+
 		return true;
 	}
 	

@@ -41,11 +41,13 @@ public class VagrantUtilities {
 	
 	public List<LogBean> getVagrantLogs(HttpServletRequest request){
 		Integer userID = Integer.parseInt(request.getParameter("userID") != null?request.getParameter("userID"):null);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat getdateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat existingFormat =new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+		SimpleDateFormat changeDateFormat = new SimpleDateFormat("yyyy-MM-dd-hh:mm:ss");
 		List<LogBean> logFileList = new ArrayList<LogBean>();
 		try {
-			Date fromDate = convertStringInDate(dateFormat.format(dateFormat.parse(request.getParameter("fromDate"))));
-			Date toDate = convertStringInDate(dateFormat.format(dateFormat.parse(request.getParameter("toDate"))));
+			Date fromDate = convertStringInDate(getdateFormat.format(getdateFormat.parse(request.getParameter("fromDate"))));
+			Date toDate = convertStringInDate(getdateFormat.format(getdateFormat.parse(request.getParameter("toDate"))));
 			String logdir= Utilities.getInstance().fetchActiveProjectDirectory(userID)+OSProperties.getInstance().getOSFileSeparator()+OSProperties.getInstance().getLogDirName();
 			File[] files = new File(logdir).listFiles();
 			if (files == null){ return logFileList;}
@@ -60,7 +62,7 @@ public class VagrantUtilities {
 						logBean.setVagrantID(fileName.split("_")[1] != null?fileName.split("_")[1]:null);
 						logBean.setUserID(Integer.parseInt(fileName.split("_")[0] != null?fileName.split("_")[0]:null));
 						logBean.setStatus(fileName.split("_")[fileName.split("_").length-1].split("\\.")[0]);
-						logBean.setTime(fileName.split("_")[2]);
+						logBean.setTime(changeDateFormat.format(existingFormat.parse(fileName.split("_")[2])));
 						logFileList.add(logBean);
 					}
 				}
@@ -74,6 +76,7 @@ public class VagrantUtilities {
 	}
 	
 	public String getVagrantLogContent(HttpServletRequest request){
+		
 		Integer userID = Integer.parseInt(request.getParameter("userID") != null?request.getParameter("userID"):null);
 		String fileName = request.getParameter("fileName") != null? request.getParameter("fileName"):null;
 		

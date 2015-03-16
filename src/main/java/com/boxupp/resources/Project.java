@@ -105,10 +105,10 @@ public class Project {
 	@POST
 	@Path("/createVagrantFile")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public VagrantFileStatus saveAsFile(JsonNode VagrantFileData) throws IOException
+	public VagrantFileStatus saveAsFile(JsonNode vagrantFileData) throws IOException
 	{
-		String projectID = VagrantFileData.get("projectID").getTextValue();
-		String userID = VagrantFileData.get("userID").getTextValue();
+		String projectID = vagrantFileData.get("projectID").getTextValue();
+		String userID = vagrantFileData.get("userID").getTextValue();
 		return Utilities.getInstance().saveVagrantFile(projectID, userID);
 	}
 	

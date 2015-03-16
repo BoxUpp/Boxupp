@@ -29,6 +29,7 @@ import com.boxupp.db.DAOProvider;
 import com.boxupp.db.beans.MachineConfigurationBean;
 import com.boxupp.db.beans.MachineProjectMapping;
 import com.boxupp.db.beans.ProjectBean;
+import com.boxupp.db.beans.ShellScriptMapping;
 import com.boxupp.db.beans.UserProjectMapping;
 import com.boxupp.responseBeans.StatusBean;
 import com.boxupp.utilities.Utilities;
@@ -43,7 +44,7 @@ import com.j256.ormlite.stmt.SelectArg;
 public class MachineConfigDAOManager implements DAOImplInterface {
 	private static Logger logger = LogManager.getLogger(MachineConfigDAOManager.class.getName());
 	public static Dao<MachineConfigurationBean, Integer>machineConfigDao = null;
-	protected static Dao<MachineProjectMapping, Integer> machineMappingDao = null;
+	public static Dao<MachineProjectMapping, Integer> machineMappingDao = null;
 	private static MachineConfigDAOManager machineConfigDBManager = null;
 	private PreparedQuery<MachineConfigurationBean> queryForBoxesOfProject = null;
 	
@@ -93,6 +94,18 @@ public class MachineConfigDAOManager implements DAOImplInterface {
 		return statusBean;
 	}
 
+	/*@Override
+	public <E> List<E> readAllDB() {
+		List<MachineConfigurationBean> machineconfigList = null;
+		try{
+			machineconfigList = machineConfigDao.queryForAll();
+		}catch(SQLException e){
+			logger.error("Error querying the machine configuration list  from DB : " + e.getMessage());
+		}
+		return (List<E>) machineconfigList;
+		
+	}*/
+
 	@Override
 	public StatusBean update(JsonNode updatedData){
 		MachineConfigurationBean machineConfigBean  = null;
@@ -127,6 +140,25 @@ public class MachineConfigDAOManager implements DAOImplInterface {
 		return statusBean;
 	}
 
+	/*@Override
+	public StatusBean delete(String machineID) {
+		StatusBean statusBean = new StatusBean();
+		MachineConfigurationBean machineConfig= new MachineConfigurationBean(); 
+		try {
+			machineConfig = machineConfigDao.queryForId(Integer.parseInt(machineID));
+			machineConfig.setIsDisabled(true);
+			machineConfigDao.update(machineConfig);
+
+		} catch (SQLException e) {
+			logger.error("Error creating a new project : " + e.getMessage());
+			statusBean.setStatusCode(1);
+			statusBean.setStatusMessage("Error deleting machine configuration : "+e.getMessage());
+			e.printStackTrace();
+		}
+		statusBean.setStatusCode(0);
+		statusBean.setStatusMessage("Machine Congifuration delete successfully");
+		return statusBean;
+	}*/
 	@Override
 	public StatusBean delete(String machineId) {
 		Integer machineID = Integer.parseInt(machineId);
@@ -190,6 +222,23 @@ public class MachineConfigDAOManager implements DAOImplInterface {
 		if(machineList == null)return null;
 		return (List<E>)machineList;
 	}
+
+	
+	/*public  List<MachineConfigurationBean> fetchProjectMachines(String mappedId) {
+		List<MachineConfigurationBean> machineList = new ArrayList<MachineConfigurationBean>();
+		try {
+		if (machineForProjectQuery == null) {
+			machineForProjectQuery =  makeMachineForProjectQuery();
+		}
+		 machineForProjectQuery.setArgumentHolderValue(0, ProjectDAOManager.getInstance().projectDao.queryForId(Integer.parseInt(mappedId)));
+		 machineList = machineConfigDao.query(machineForProjectQuery);
+		} catch (NumberFormatException e) {
+			logger.error("Error in fetching Machine configuration is :"+e.getMessage());
+		} catch (SQLException e) {
+			logger.error("Error in fetching Machine configuration is :"+e.getMessage());
+		}
+		return machineList;
+	}*/
 	
 	private PreparedQuery<MachineConfigurationBean> makeQueryForBoxesOfProject() throws SQLException {
 		
@@ -249,19 +298,52 @@ public class MachineConfigDAOManager implements DAOImplInterface {
 			shellProcessor.executeVagrantFile(location,vagrantCommand, userID, new VagrantOutputStream());
 		} catch (NumberFormatException e) {
 			statusBean.setStatusCode(1);
-			statusBean.setStatusMessage("error in stoping box"+e.getMessage());
+			statusBean.setStatusMessage("error in reloading box"+e.getMessage());
 		} catch (SQLException e) {
 			statusBean.setStatusCode(1);
-			statusBean.setStatusMessage("error in stoping box"+e.getMessage());
+			statusBean.setStatusMessage("error in reloading box"+e.getMessage());
 		} catch (IOException e) {
 			statusBean.setStatusCode(1);
-			statusBean.setStatusMessage("error in stoping box"+e.getMessage());
+			statusBean.setStatusMessage("error in reloading box"+e.getMessage());
 		} catch (InterruptedException e) {
 			statusBean.setStatusCode(1);
-			statusBean.setStatusMessage("error in stoping box"+e.getMessage());
+			statusBean.setStatusMessage("error in reloading box"+e.getMessage());
 		}
 		statusBean.setStatusCode(0);
-		statusBean.setStatusMessage("Machine stop successfully");
+		statusBean.setStatusMessage("Machine reloading successfully");
+
 		return statusBean;
 	}
+	
+	public StatusBean updatePuppetMasterMapping(JsonNode updatedData){
+		Integer projectID = Integer.parseInt(updatedData.get("projectID").getTextValue());
+
+		Gson machineData = new GsonBuilder().setDateFormat("yyyy'-'MM'-'dd HH':'mm':'ss").create();
+		MachineConfigurationBean machineConfigBean = machineData.fromJson(updatedData.toString(),MachineConfigurationBean.class);
+		StatusBean statusBean = new StatusBean();
+		try {
+			ProjectBean projectBean = ProjectDAOManager.getInstance().projectDao.queryForId(projectID);
+			 List<MachineProjectMapping> mapping = machineMappingDao.queryBuilder().where().eq(MachineProjectMapping.PROJECT_ID_FIELD_NAME, projectBean).query();
+			 for(MachineProjectMapping machineMapping : mapping){
+				 machineMapping.setIsPuppetMaster(false);
+				 machineMappingDao.update(machineMapping);
+				 machineMappingDao.refresh(machineMapping);
+			 }
+		 	 MachineConfigurationBean machineBean = machineConfigDao.queryForEq("vagrantID", machineConfigBean.getVagrantID()).get(0);
+		 	 MachineProjectMapping machineMapping = machineMappingDao.queryBuilder().where().eq(MachineProjectMapping.PROJECT_ID_FIELD_NAME, projectBean).and().eq(MachineProjectMapping.MACHINE_ID_FIELD_NAME, machineBean).query().get(0);
+			 machineMapping.setIsPuppetMaster(true);
+			 machineMappingDao.update(machineMapping);
+								
+
+		} catch (SQLException e) {
+			logger.error("Error  updating machine project mapping for puppet master  : " + e.getMessage());
+			statusBean.setStatusCode(1);
+			statusBean.setStatusMessage("Error updating machine Project Mapping with Puppet Master  configuration : "+e.getMessage());
+		}
+		
+		statusBean.setStatusCode(0);
+		statusBean.setStatusMessage("Machine Project Mapping with puppet Master Configuration updated successfully");
+		return statusBean;
+	}
+
 }

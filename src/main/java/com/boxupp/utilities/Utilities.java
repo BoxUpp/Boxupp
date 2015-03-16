@@ -18,10 +18,13 @@ package com.boxupp.utilities;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,11 +40,14 @@ import com.boxupp.dao.ProjectDAOManager;
 import com.boxupp.dao.PuppetModuleDAOManager;
 import com.boxupp.dao.ShellScriptDAOManager;
 import com.boxupp.db.beans.MachineConfigurationBean;
+import com.boxupp.db.beans.MachineProjectMapping;
+import com.boxupp.db.beans.ProjectBean;
 import com.boxupp.db.beans.PuppetModuleBean;
 import com.boxupp.db.beans.PuppetModuleMapping;
 import com.boxupp.db.beans.ShellScriptBean;
 import com.boxupp.db.beans.ShellScriptMapping;
 import com.boxupp.db.beans.SyncFoldersBean;
+import com.boxupp.responseBeans.StatusBean;
 import com.boxupp.responseBeans.VagrantFileStatus;
 
 public class Utilities { 
@@ -68,14 +74,41 @@ public class Utilities {
 		}
 		return utilities;
 	}
-
+	
+	/*public BoxuppVMData populateVMDataBean(JsonNode mappings){
+		
+		Gson boxuppConfigurations = new Gson();
+		BoxuppVMData boxuppVMData = new BoxuppVMData();
+		try{
+			boxuppVMData = boxuppConfigurations.fromJson(mappings.toString(),BoxuppVMData.class);
+		}catch(NumberFormatException e){
+			System.out.println("Number format exception for : "+mappings.toString());
+		}
+		return boxuppVMData;
+	}
+	
+	public BoxuppScriptsData populateScriptsBean(JsonNode mappings){
+		
+		Gson scriptsConfigurations = new Gson();
+		BoxuppScriptsData boxuppScriptsData = new BoxuppScriptsData();
+		boxuppScriptsData = scriptsConfigurations.fromJson(mappings.toString(),BoxuppScriptsData.class);
+		return boxuppScriptsData;
+	}
+	
+	public BoxuppPuppetData populatePuppetData (JsonNode mappings){
+		Gson puppetConfigurations = new Gson();
+		BoxuppPuppetData boxuppPuppetData = new BoxuppPuppetData();
+		boxuppPuppetData = puppetConfigurations.fromJson(mappings.toString(), BoxuppPuppetData.class);
+		return boxuppPuppetData;
+	}*/
+	
 	public boolean createRequiredFoldersIfNotExists(){
 		String boxuppDirPath = osProperties.getUserHomeDirectory() + 
 				 osProperties.getOSFileSeparator() + "Boxupp";
 		String moduleDir = PuppetUtilities.getInstance().constructModuleDirectory();
-		String manifestDir = PuppetUtilities.getInstance().constructManifestsDirectory();
+		//String manifestDir = PuppetUtilities.getInstance().constructManifestsDirectory();
 		checkIfDirExists(new File(moduleDir));
-		checkIfDirExists(new File(manifestDir));
+		//checkIfDirExists(new File(manifestDir));
 		File boxuppDir = new File(boxuppDirPath);
 		if(!boxuppDir.exists()){
 			boxuppDir.mkdirs();
@@ -95,6 +128,8 @@ public class Utilities {
 			projectDir.mkdir();
 			logger.debug("Project Directory initialized at : " + userHomeDir);
 		}
+		String manifestDir = userHomeDir+ osProperties.getOSFileSeparator()+osProperties.getManifestsDirName();
+		checkIfDirExists(new File(manifestDir));
 //		activeProjectDirectory = userHomeDir;
 	}
 	public void initializeDockerVagrantFile(Integer projectID){
@@ -114,12 +149,42 @@ public class Utilities {
 			}
 			reader.close();
 			writer.close();
+//			Path FROM = Paths.get(resourceUrl.getPath());
+//		    Path TO = Paths.get(projectDir+osProperties.getOSFileSeparator()+osProperties.getDockerVagrantFileDir()+osProperties.getOSFileSeparator()+osProperties.getVagrantFileName());
+		    //overwrite existing file, if exists
+		    
+//			File destination = new File(projectDir+osProperties.getOSFileSeparator()+osProperties.getDockerVagrantFileDir()+osProperties.getOSFileSeparator()+osProperties.getVagrantFileName());
+//			File sourcefile = new File(getClass().getResource("/Vagrantfile").getFile());
+//			  
+//		    CopyOption[] options = new CopyOption[]{
+//		      StandardCopyOption.REPLACE_EXISTING,
+//		      StandardCopyOption.COPY_ATTRIBUTES
+//		    }; 
+//		    System.out.println(FROM);
+//		    System.out.println(TO);
+//			Files.copy(sourcefile.toPath(), destination.toPath(), options);
 		} catch (IOException e) {
 			logger.error("Error in coping static vagrant file for docker "+e.getMessage());
 		} 
 		  
 	}
-	
+	/*public void commitScriptsToDisk(BoxuppScriptsData scriptsData){
+		ArrayList<ShellScriptBean> scriptBeanList = scriptsData.getScriptsList();
+		for(int counter=0; counter<scriptBeanList.size(); counter++){
+			writeScriptToDisk(scriptBeanList.get(counter));
+		}
+	}
+	*/
+	/*
+	public void commitFoldersToDisk(BoxuppVMData vmData){
+		ArrayList<VMConfiguration> vmConfigurations = vmData.getVmData();
+		for(int counter=0; counter<vmConfigurations.size(); counter++){
+			ArrayList<SyncFolderMapping> folderMappings = vmConfigurations.get(counter).getSyncFolders();
+			for(int folderCounter = 0 ; folderCounter<folderMappings.size(); folderCounter++){
+				createFolderOnDisk(folderMappings.get(folderCounter).getHostFolder());
+			}
+		}
+	}*/
 	public void commitSyncFoldersToDisk(List<MachineConfigurationBean> machineConfigs, Integer userID){
 	
 		for(MachineConfigurationBean machineConfig : machineConfigs){
@@ -255,9 +320,44 @@ public class Utilities {
     	}
 		
 	}
+	public  StatusBean copyFile(File source, File dest) throws IOException {
+		StatusBean stBean = new StatusBean();
+		InputStream inStream = null;
+		OutputStream outStream = null;
+	 
+	    	try{
+	 
+	    	   
+	    	    inStream = new FileInputStream(source);
+	    	    outStream = new FileOutputStream(dest);
+	 
+	    	    byte[] buffer = new byte[1024];
+	 
+	    	    int length;
+	    	    //copy the file content in bytes 
+	    	    while ((length = inStream.read(buffer)) > 0){
+	 
+	    	    	outStream.write(buffer, 0, length);
+	 
+	    	    }
+	 
+	    	    inStream.close();
+	    	    outStream.close();
+	    	    stBean.setStatusCode(0);
+	    	    stBean.setStatusMessage("File is copied successful!");
+	 
+	    	}catch(IOException e){
+	    		logger.error("Error in copy file : "+e.getMessage());
+	    	}
+	    return stBean;
+	}
 	public VagrantFileStatus saveVagrantFile(String projectID, String userID){
+		VagrantFileStatus fileStatus = new VagrantFileStatus();
 		/*String projectID = vargantFileData.get("projectID").getTextValue();
 		String userID = vargantFileData.get("userID").getTextValue();*/
+		MachineConfigurationBean puppetMasterMachine = null;
+		try{
+		ProjectBean projectbean  = ProjectDAOManager.getInstance().projectDao.queryForId(Integer.parseInt(projectID));
 		List<MachineConfigurationBean>  machineConfigList = MachineConfigDAOManager.getInstance().retireveBoxesForProject(projectID);
 		List<PuppetModuleBean>  puppetModuleList = PuppetModuleDAOManager.getInstance().retireveModulesForProject(projectID);
 		List<ShellScriptBean> shellScriptList = ShellScriptDAOManager.getInstance().retireveScriptsForProject(projectID);
@@ -265,8 +365,19 @@ public class Utilities {
 		List<PuppetModuleMapping> puppetModuleMappingList = ProjectDAOManager.getInstance().retireveModulesMapping(projectID);
 		String provider  = ProjectDAOManager.getInstance().getProviderForProject(projectID);
 		Utilities.getInstance().commitSyncFoldersToDisk(machineConfigList, Integer.parseInt(userID));
-		boolean configFileData = ConfigurationGenerator.generateConfig(machineConfigList, puppetModuleList,  shellScriptList, shellScriptMappingList, puppetModuleMappingList, provider, projectID);
-		VagrantFileStatus fileStatus = new VagrantFileStatus();
+		List<MachineProjectMapping> puppetMasterMachines = MachineConfigDAOManager.getInstance().machineMappingDao.queryBuilder().where().eq(MachineProjectMapping.PROJECT_ID_FIELD_NAME, projectbean).and().eq(MachineProjectMapping.Is_PuppetMaster, true).query();
+		if(!puppetMasterMachines.isEmpty()){
+			 puppetMasterMachine = puppetMasterMachines.get(0).getMachineConfig();
+		for(MachineConfigurationBean machineBean : machineConfigList){
+			 if(machineBean.getVagrantID().equalsIgnoreCase( puppetMasterMachine.getVagrantID())){
+				 machineConfigList.remove(machineBean);
+				 machineConfigList.add(0, puppetMasterMachine);
+				 break;
+			 }
+		}
+		}
+		boolean configFileData = ConfigurationGenerator.generateConfig(machineConfigList, puppetModuleList,  shellScriptList, shellScriptMappingList, puppetModuleMappingList, provider, projectID, puppetMasterMachine );
+		
 		if(configFileData){
 			logger.info("Started saving vagrant file");
 			FileManager fileManager = new FileManager();
@@ -277,8 +388,12 @@ public class Utilities {
 		else{
 			logger.info("Failed to save vagrant file !!");
 		}
+		}catch(Exception ex){
+			logger.error("error in saving vagrant file"+ex);
+		}
 		//persistData(mappings);
 		return fileStatus;
 	}
 	
-}
+
+	}

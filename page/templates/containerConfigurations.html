@@ -82,5 +82,9 @@
 	Puppet Change flag - {{activeVM.moduleChangeFlag}}-->
 	<div style="clear:both;">
 		<a class="btn btn-info" ng-click="deployBox(activeVM)" ng-disabled="activeVM.underExecution" ng-show="checkMachineFlags(activeVM)" ><i class="fa fa-external-link-square"></i> Commit changes</a>
+
+		<a ng-disabled="activeVM.underExecution"class="btn btn-info" ng-click="stopBox(activeVM)" ng-disabled="activeVM.underExecution"  ><i class="fa fa-external-link-square"></i> Stop</a>
+		<a ng-disabled="activeVM.underExecution" class="btn btn-info" ng-click="reloadBox(activeVM)" ng-disabled="activeVM.underExecution"  ><i class="fa fa-external-link-square"></i> Reload</a>
+
 	</div>
 </div>

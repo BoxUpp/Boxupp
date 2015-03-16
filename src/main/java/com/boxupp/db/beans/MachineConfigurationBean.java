@@ -17,9 +17,7 @@ package com.boxupp.db.beans;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import org.codehaus.jackson.annotate.JsonIgnore;
-
 import com.boxupp.dao.MachineConfigDAOManager;
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.ForeignCollection;
@@ -84,8 +82,8 @@ public class MachineConfigurationBean {
 	@DatabaseField(useGetSet = true)
 	private boolean guiMode;
 
-	@DatabaseField(useGetSet = true)
-	private boolean puppetMasterStatus;
+	@DatabaseField(useGetSet = true, defaultValue="false")
+	private boolean isPuppetMaster;
 
 	@DatabaseField(useGetSet = true)
 	private String providerType;
@@ -119,6 +117,7 @@ public class MachineConfigurationBean {
 	
 	@DatabaseField(useGetSet = true, defaultValue="0")
 	private Integer moduleChangeFlag;
+	
 	
 	public Integer getMachineID() {
 		return machineID;
@@ -310,12 +309,12 @@ public class MachineConfigurationBean {
 		this.providerType = providerType;
 	}
 
-	public boolean getPuppetMasterStatus() {
-		return puppetMasterStatus;
+	public boolean getIsPuppetMaster() {
+		return isPuppetMaster;
 	}
 
-	public void setPuppetMasterStatus(boolean puppetMasterStatus) {
-		this.puppetMasterStatus = puppetMasterStatus;
+	public void setIsPuppetMaster(boolean isPuppetMaster) {
+		this.isPuppetMaster = isPuppetMaster;
 	}
 
 	public boolean getShellMappedStatus() {

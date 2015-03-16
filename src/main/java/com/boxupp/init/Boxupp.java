@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  *  Copyright 2014 Paxcel Technologies
  *
@@ -34,6 +35,10 @@ import com.boxupp.beans.Config;
 import com.boxupp.db.DBConnectionManager;
 import com.boxupp.utilities.Utilities;
 import com.boxupp.ws.VagrantConsole;
+import com.boxupp.ws.MachineStatus;
+
+
+
 
 public class Boxupp {
 	
@@ -71,14 +76,23 @@ public class Boxupp {
 		handler.setHandler(wsHandler);
 		handler.setContextPath("/vagrantConsole/");
 		
+		
+		WebSocketHandler machineStatusWSHandler = new WebSocketHandler(){
+			@Override
+            public void configure(WebSocketServletFactory webSocketServletFactory) {
+                webSocketServletFactory.register(MachineStatus.class);
+            }
+		};
+		ContextHandler machineStatusHandler = new ContextHandler();
+		machineStatusHandler.setHandler(machineStatusWSHandler);
+		machineStatusHandler.setContextPath("/machineStatus/");		
+		contexts.setHandlers(new Handler[] { list });
 		list.setHandlers(new Handler[] {
 				appContextBuilder.getStaticResourceHandler(),
 				appContextBuilder.getWebAppHandler(),
-				wsHandler		
+
+				handler, machineStatusHandler		
 		});
-		
-		contexts.setHandlers(new Handler[] { list });
-		
 		jettyServer.setHandler(contexts);
 		Runnable runner = new Runnable() {
 			@Override

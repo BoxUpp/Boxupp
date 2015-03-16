@@ -424,6 +424,16 @@ input[type="text"].ng-invalid-pattern, input[type="text"].ng-invalid-maxlength {
 		-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(236, 51, 51, 0.6) !important;
 		box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(212, 44, 30, 0.6) !important;
 }
+.success{
+  background-color: #5cb85c !important;
+}
+.error{
+  background-color: #ea5c57 !important;
+}
+.loggerBarTextColor{
+  color: white !important;
+  font-size: 15px;
+}
 /*
 div.collapseCtrlBar{
 	height:0px;

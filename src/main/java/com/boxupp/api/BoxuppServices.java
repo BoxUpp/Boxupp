@@ -62,6 +62,7 @@ public class BoxuppServices {
 		try {
 			statusBean.setData(ProjectDAOManager.getInstance().projectDao.queryForId(projectID));
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Utilities.getInstance().changeActiveDirectory(userID,projectID);
@@ -85,6 +86,101 @@ public class BoxuppServices {
 		String userID = request.getParameter("userID");
 		return manager.fetchVagrantFileData(projectID, userID);
 	}
+	
+	/*@POST
+	@Path("/persistData")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public SnapshotStatus persistData(JsonNode boxuppMappings) throws IOException{
+		return SnapshotManager.persistBoxuppMappings(boxuppMappings);
+	}*/
+	
+	/*@GET
+	@Path("/retrieveData")
+	@Produces(MediaType.APPLICATION_JSON)
+	public SnapshotData retrieveFormSnapshot() throws ClassNotFoundException, IOException{
+		return SnapshotManager.retrieveBoxuppMappings();
+	}*/
+
+	/*@POST
+	@Path("/saveAsFile")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public VagrantFileStatus saveAsFile(JsonNode mappings) throws IOException
+	{
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./trial")));
+		String data = mappings.get("shellScripts").get(0).get("scriptSource").getValueAsText().replaceAll("\n","\r\n"); 
+		bw.write(data);
+		bw.close();
+		BoxuppVMData boxuppVMData = new BoxuppVMData();
+		boxuppVMData = Utilities.getInstance().populateVMDataBean(mappings);
+		
+		BoxuppScriptsData boxuppScripts = new BoxuppScriptsData();
+		boxuppScripts = Utilities.getInstance().populateScriptsBean(mappings);
+		
+		BoxuppPuppetData boxuppPuppetData = new BoxuppPuppetData();
+		boxuppPuppetData = Utilities.getInstance().populatePuppetData(mappings.get("puppetData"));
+		
+		PuppetUtilities.getInstance().commitPuppetDataToDisk(boxuppPuppetData);
+		//Utilities.getInstance().commitScriptsToDisk(boxuppScripts);
+		Utilities.getInstance().commitFoldersToDisk(boxuppVMData);
+		
+		boolean configFileData = ConfigurationGenerator.generateConfig(boxuppVMData);
+		VagrantFileStatus fileStatus = new VagrantFileStatus();
+		
+		if(configFileData){
+			logger.info("Started saving vagrant file");
+			FileManager fileManager = new FileManager();
+			String renderedTemplate = ConfigurationGenerator.getVelocityFinalTemplate();
+			fileStatus = fileManager.writeFileToDisk(renderedTemplate);
+			logger.info("Vagrant file save completed");
+		}
+		else{
+			logger.info("Failed to save vagrant file !!");
+		}
+		persistData(mappings);
+		return fileStatus;
+	}
+	*/
+	
+	/*@POST
+	@Path("/saveAsFile")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public VagrantFileStatus saveAsFile(@Context HttpServletRequest request) throws IOException
+	{
+		String projectID = request.getParameter("projectID");
+		String userID = request.getParameter("userID");
+		List<MachineConfigurationBean>  machineConfigList = MachineConfigDAOManager.getInstance().read(projectID);
+		List<PuppetModuleBean>  puppetModuleList = PuppetModuleDAOManager.getInstance().read(projectID);
+		List<ShellScriptBean> shellScriptList = ShellScriptDAOManager.getInstance(). read(projectID);
+		List<ShellScriptMapping> shellScriptMappingList = null;
+		List<PuppetModuleMapping> puppetModuleMappingList = null;
+		try {
+			shellScriptMappingList = ShellScriptDAOManager.getInstance().shellScriptMappingDao.queryForEq("project", ProjectDAOManager.getInstance().projectDao.queryForId(Integer.parseInt(projectID)));
+		
+			puppetModuleMappingList = PuppetModuleDAOManager.getInstance().puppetModuleMappingDao.queryForEq("project",ProjectDAOManager.getInstance().projectDao.queryForId(Integer.parseInt(projectID)));
+		} catch (NumberFormatException e) {
+			logger.error(e.getMessage());
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+		}
+		String provider  = ProjectDAOManager.getInstance().getProviderForProject(projectID);
+	
+		Utilities.getInstance().commitSyncFoldersToDisk(machineConfigList, Integer.parseInt(userID));
+		boolean configFileData = ConfigurationGenerator.generateConfig(machineConfigList, puppetModuleList,  shellScriptList, shellScriptMappingList, puppetModuleMappingList, provider, projectID );
+		VagrantFileStatus fileStatus = new VagrantFileStatus();
+		
+		if(configFileData){
+			logger.info("Started saving vagrant file");
+			FileManager fileManager = new FileManager();
+			String renderedTemplate = ConfigurationGenerator.getVelocityFinalTemplate();
+			fileStatus = fileManager.writeFileToDisk(renderedTemplate, Integer.parseInt(userID));
+			logger.info("Vagrant file save completed");
+		}
+		else{
+			logger.info("Failed to save vagrant file !!");
+		}
+		//persistData(mappings);
+		return fileStatus;
+	}*/
 	
 	@GET
 	@Path("/boxupp")
@@ -134,7 +230,6 @@ public class BoxuppServices {
 	@GET
 	@Path("/checkMachineStatus")
 	@Produces(MediaType.APPLICATION_JSON)
-	
 	public VagrantStatus checkMachineStatus(@Context HttpServletRequest request){
 		Integer userID = Integer.parseInt(request.getParameter("userID"));
 		String vagrantID = request.getParameter("vagrantID");
@@ -144,6 +239,19 @@ public class BoxuppServices {
 		
 	}
 	
+	/*@GET
+	@Path("/checkAllMachineStatus")
+	@Produces(MediaType.APPLICATION_JSON)
+	public VagrantStatus checkAllMachineStatus(@Context HttpServletRequest request){
+		Integer userID = Integer.parseInt(request.getParameter("userID"));
+		String vagrantID = request.getParameter("boxesData");
+		VagrantCommandProcessor commandProcessor = new VagrantCommandProcessor();
+		String location = Utilities.getInstance().fetchActiveProjectDirectory(userID);
+		return commandProcessor.checkMachineStatus(location,vagrantID);
+		
+	}*/
+	
+
 	@GET
 	@Path("/checkURL")
 	@Produces(MediaType.APPLICATION_JSON)

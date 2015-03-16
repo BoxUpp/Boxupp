@@ -13,9 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *******************************************************************************/
-angular.module('boxuppApp').controller('ctrlBarController',function($scope,shellScript,$routeParams,miscUtil,MachineConfig){
 
-	
+angular.module('boxuppApp').controller('ctrlBarController',function($scope,$q,vagrantStatus,shellScript,executeCommand,$routeParams,Projects,miscUtil,MachineConfig, boxFunctionality){
+
+	$scope.project = Projects.get({id : $routeParams.projectID});
 
 	$scope.saveNewScript = function(newShellScriptData){
 		newShellScriptData.isDisabled = false;
@@ -46,7 +47,6 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		//Only handle script name change events//
 		if((newValue !== oldValue) && ($scope.scriptSelected !== -1)){
 		$scope.setShellChangeFlag();
-		console.log($scope.boxuppConfig.shellChangeFlag);
 		/*To handle empty scripts case*/
 		if(((typeof newValue[$scope.scriptSelected]) !== 'undefined') && 
 			((typeof oldValue[$scope.scriptSelected]) !== 'undefined')){
@@ -71,6 +71,7 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 	};
 
 	$scope.createBoxes = function(boxData){
+
 		$('#boxModal').modal('hide');
 		$scope.quickBoxCommitLoader = true;
 		$scope.toBeCreatedBox = angular.copy(boxData);
@@ -78,11 +79,25 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		$scope.toBeCreatedBox.providerID = $routeParams.providerID;
 		$scope.toBeCreatedBox.providerType = $scope.providerType;
 		$scope.toBeCreatedBox.isDisabled = false;
+
+		if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+			$scope.toBeCreatedBox.isPuppetMaster = true;
+		}
 		MachineConfig.save($scope.toBeCreatedBox,function(data){
-			$scope.boxesData.push(data.beanData);
-			$scope.quickBox = {};
-			$scope.quickBoxForm.$setPristine();
-			$scope.deployBox(data.beanData);
+			if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+				alert("This is Puppet Master  Machine. Please to be make sure it's always be in running state.");
+				$scope.toBeCreatedBox.isPuppetMaster = true;
+				$scope.updateProjectMapping($scope.toBeCreatedBox, data);
+				
+			}else if($scope.boxesData.length != 0 && $scope.project.provisionerType == "Master-Agent"){	
+				$scope.executeCommandOnMaster(data);			
+			}else{
+				$scope.deployBox(data.beanData);
+			}
+				$scope.boxesData.push(data.beanData);
+				$scope.quickBox = {};
+				$scope.quickBoxForm.$setPristine();
+
 		});
 		$scope.quickBoxForm.$setPristine();
 		$scope.quickBoxCommitLoader = false;
@@ -102,11 +117,25 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		$scope.toBeCreatedBox.projectID = $routeParams.projectID;
 		$scope.toBeCreatedBox.providerType = $scope.providerType;
 		$scope.toBeCreatedBox.isDisabled = false;
+
+		if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+			$scope.toBeCreatedBox.isPuppetMaster = true;
+		}
 		MachineConfig.save($scope.toBeCreatedBox,function(data){
-			$scope.boxesData.push($scope.dockerLinkMappingForFrontend(data.beanData));
-			$scope.quickBox = {};
-			$scope.containerQuickBoxForm.$setPristine();
-			$scope.deployBox(data.beanData);
+			if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+				alert("This is Puppet Master  Machine. Please to be make sure it's always be in running state.");
+				$scope.toBeCreatedBox.isPuppetMaster = true;
+				$scope.updateProjectMapping($scope.toBeCreatedBox, data);
+				
+			}else if($scope.boxesData.length != 0 && $scope.project.provisionerType == "Master-Agent"){	
+				$scope.executeCommandOnDockerMaster(data);			
+			}else{
+				$scope.deployBox(data.beanData);
+			}
+				$scope.boxesData.push($scope.dockerLinkMappingForFrontend(data.beanData));
+				$scope.quickBox = {};
+				$scope.containerQuickBoxForm.$setPristine();
+
 		});
 		$scope.containerQuickBoxForm.$setPristine();
 		$scope.quickContainerBoxCommitLoader = false;
@@ -123,11 +152,24 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		$scope.toBeCreatedBox.providerID = $routeParams.providerID
 		$scope.toBeCreatedBox.providerType = $scope.providerType;
 		$scope.toBeCreatedBox.isDisabled = false;
+
+		if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+			$scope.toBeCreatedBox.isPuppetMaster = true;
+		}
 		MachineConfig.save($scope.toBeCreatedBox,function(data){
+			if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+			alert("This is Puppet Master  Machine. Please to be make sure it's always be in running state.");
+				$scope.toBeCreatedBox.isPuppetMaster = true;
+				$scope.updateProjectMapping($scope.toBeCreatedBox, data);
+			}else if($scope.boxesData.length != 0 && $scope.project.provisionerType == "Master-Agent"){	
+				$scope.executeCommandOnMaster(data);			
+			}else{
+				$scope.deployBox(data.beanData);
+			}
 			$scope.boxesData.push(data.beanData);
 			$scope.quickBox = {};
 			$scope.quickBoxForm.$setPristine();
-			$scope.deployBox(data.beanData);
+
 		});
 		$scope.quickBoxCommitLoader = false;	
 	}
@@ -144,11 +186,24 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		$scope.toBeCreatedBox.projectID = $routeParams.projectID;
 		$scope.toBeCreatedBox.providerType = $scope.providerType;
 		$scope.toBeCreatedBox.isDisabled = false;
+
+		if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+			$scope.toBeCreatedBox.isPuppetMaster = true;
+		}
 		MachineConfig.save($scope.toBeCreatedBox,function(data){
-			$scope.boxesData.push(data.beanData);
-			$scope.quickBox = {};
-			$scope.containerQuickBoxForm.$setPristine();
-			$scope.deployBox(data.beanData);
+		    if($scope.boxesData.length == 0 && $scope.project.provisionerType == "Master-Agent"){
+				alert("This is Puppet Master  Machine. Please to be make sure it's always be in running state.");
+				$scope.updateProjectMapping($scope.toBeCreatedBox, data);
+			}else if($scope.boxesData.length != 0 && $scope.project.provisionerType == "Master-Agent"){	
+				$scope.executeCommandOnDockerMaster(data);			
+			}else{
+				$scope.deployBox(data.beanData);
+			}
+				$scope.boxesData.push(data.beanData);
+				$scope.quickBox = {};
+				$scope.containerQuickBoxForm.$setPristine();
+							
+
 		});
 		$scope.containerQuickBoxCommitLoader = false;	
 	}
@@ -174,7 +229,61 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		$scope.rawBoxForm.basicSettings.boxUrl.$render();
 		$scope.rawBoxForm.basicSettings.hostName.$render();
 
+
+
 	}
+	$scope.updateProjectMapping = function(newBox, data){
+		var deferred = $q.defer();
+		boxFunctionality.updateMachineMapping(newBox).then(function(response, error){
+			if(response.statusCode === 0){
+				deferred.resolve(response);
+				console.log('Machine Data Updated Succesfully : ');
+				$scope.deployBox(data.beanData);
+				
+			}else{
+				deferred.reject('Error in updating machine Mapping');
+			}
+		});
+		return deferred.promise;
+	}
+	$scope.executeCommandOnMaster = function(agentBox){
+		var deferred = $q.defer();
+		angular.forEach($scope.boxesData,function(box){
+			if(box.isPuppetMaster){
+				$scope.createVagrantFile().then(function(){
+					var commandForMachine = null;
+					vagrantStatus.checkMachineStatus($routeParams.userID, box.vagrantID).then(function(response){
+						
+						if(response.statusCode != 1) {
+							commandForMachine = "vagrant up  "+box.vagrantID;
+						}else{
+							commandForMachine = "vagrant provision --provision-with shell  "+box.vagrantID;
+						}
+					});
+					
+					executeCommand.triggerVagrantCommand($scope,commandForMachine,deferred);
+				});		
+			}
+		});
+		$scope.deployBox(agentBox.beanData);
+
+	}
+	$scope.executeCommandOnDockerMaster = function(agentBox){
+		var deferred = $q.defer();
+		angular.forEach($scope.boxesData,function(box){
+			if(box.isPuppetMaster){
+				$scope.createVagrantFile().then(function(){
+					$scope.stopBox(box);
+					var commandForMachine = "vagrant up "+box.vagrantID;
+					executeCommand.triggerVagrantCommand($scope,commandForMachine,deferred);
+				});		
+			}
+		});
+		$scope.deployBox(agentBox.beanData);
+
+	}
+	
+
 	$scope.cloneContainerBoxData = function(cloneBox){
 
 		$('#boxModal').modal('show');

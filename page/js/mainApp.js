@@ -14,7 +14,7 @@
  *  limitations under the License.
  *******************************************************************************/
 
-angular.module('boxuppApp').controller('vboxController',function($scope,$interval,$q,$http,$rootScope,$routeParams,$filter,$timeout,MachineConfig,ResourcesData,vagrantStatus,executeCommand,retrieveMappings,puppetModule,miscUtil,shellScript,provider,User,$location,puppetModuleResource, boxFunctionality, loggerFunctionality){
+angular.module('boxuppApp').controller('vboxController',function($scope,$interval,$q,$http,$rootScope,$routeParams,$filter,$interval, $timeout,MachineConfig,ResourcesData,vagrantStatus,executeCommand,retrieveMappings,puppetModule,miscUtil,shellScript,provider,User,$location,puppetModuleResource, boxFunctionality, loggerFunctionality){
 
 	$scope.projectData = {
 		boxesState : {
@@ -74,6 +74,8 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 	$scope.providerType = provider;
 	$scope.moduleMappingTree= {};
 	$scope.fileName="1_t_2015-01-07-14:31:05_success.log";
+	$scope.isLogFiles = false;
+
 	$scope.server = {
 		connect : function(promise) {
 			
@@ -142,6 +144,61 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 			console.log('connection has been closed');
 		}
 	};
+
+	$scope.statusServer= {
+		connect : function(promise) {
+			
+			var location = $scope.serverWSAddress + "/machineStatus/";
+			this._ws = new WebSocket(location);
+			this._ws.onopen = this._onopen;
+			this._ws.onmessage = this._onmessage;
+			this._ws.onclose = this._onclose;
+			this._ws.promise = promise;
+		},
+
+		_onopen : function() {
+			//server._send('websockets are open for communications!');
+			console.info('WebSocket connection initiated 1');
+		},
+		
+		checkReadyState : function(){
+			return this._ws.readyState;				
+		},
+		
+		_send : function(message) {
+			if (this._ws)
+				this._ws.send(message);
+		},
+
+		send : function(text) {
+			if (text != null && text.length > 0)
+				this._send(text);
+		},
+
+		_onmessage : function(message) {
+			var data = JSON.parse(message.data);
+			var boxes = [];
+			angular.forEach($scope.boxesData, function(box){
+				angular.forEach(data, function(boxStatus){
+					if(box.vagrantID === boxStatus.vagrantID){
+						box.machineStatusFlag = boxStatus.statusCode;
+						console.log(box.machineStatusFlag);
+					}
+					boxes.push(box);
+				});
+			});
+			$scope.boxesData = boxes;
+			this.close();
+			
+		},
+
+		_onclose : function(m) {
+			this.promise.resolve("Done");
+			this._ws = null;
+			console.log('connection has been closed 1');
+		}
+	};
+
 	$scope.fromDate = new Date();
 	$scope.toDate = new Date();
 	/*$scope.fromDate = $filter('date')(new Date(),'yyyy-MM-dd');
@@ -149,11 +206,38 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 	loggerFunctionality.getLogFiles($routeParams.userID, $scope.fromDate, $scope.toDate).then(function(response){
 		$scope.logFiles = response;
 	});
+
+
+	$interval(function(){ $scope.getAllMachineStatus(); }, 150000);
+	$scope.getAllMachineStatus = function(){
+		var deferred = $q.defer();
+		if($routeParams.projectID){
+			vagrantStatus.checkAllMachineStatus($scope, $routeParams.userID, deferred);
+			/*angular.forEach($scope.boxesData, function(box){
+				if(!box.underExecution){
+					vagrantStatus.checkAllMachineStatus($scope, $routeParams.userID, box.vagrantID, deferred);
+				}
+			});*/
+		}
+		
+	}
+
+
 	$scope.getLogFiles = function(fromDate, toDate){
 		loggerFunctionality.getLogFiles($routeParams.userID,fromDate, toDate).then(function(response){
 			$scope.logFiles = response;
+			if($scope.logFiles.length == 0){
+				$scope.isLogFiles = true;
+			}
 		
 	});
+	}
+	$scope.getClass = function(status){
+		if(status === 'success'){
+			return 'success';
+		}else if(status == 'error'){
+			return 'error';
+		}
 	}
 	$scope.getLogFileContent = function(fileName){
 		loggerFunctionality.getLogFileContent($routeParams.userID, fileName).then(function(response){
@@ -329,7 +413,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		// 	$scope.pushCustomMessage();
 		vmConfig.underExecution = true;
 			vagrantStatus.checkMachineStatus($routeParams.userID, vmConfig.vagrantID).then(function(response){
-				console.log(response);
+
 				vmConfig.machineStatusFlag = response.statusCode;
 				var commandForMachine = $scope.chooseBestDeployOption(vmConfig);
 				executeCommand.triggerVagrantCommand($scope,commandForMachine,deferred);
@@ -1386,10 +1470,26 @@ $('#datepicker-example7-end').Zebra_DatePicker({
                 return;
             } else {
                 console.log("waiting for connection...")
-                waitForSocketConnection(callback);
+                waitForWSConnection(callback);
             }
         }, 500);
 	}
+
+	$scope.waitForBoxStatusWSConnection = function(callback){
+		setTimeout(
+        function () {
+            if ($scope.statusServer.checkReadyState() === 1) {
+                if(callback != null){
+                    callback();
+                }
+                return;
+            } else {
+                console.log("waiting for connection1...")
+                waitForBoxStatusWSConnection(callback);
+            }
+        }, 500);
+	}
+
 
 	$scope.checkValidity = {
 		vagrantID : function(form){
@@ -1402,6 +1502,23 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 							keepgoing = false;
 						}else{
 							form.vagrantID.$setValidity('alreadyExists',true);				
+						}	
+					}
+				});
+			}
+		},
+		hostName : function(form){
+
+			if(!$scope.projectData.boxesState.update){
+				var keepgoing = true;
+				angular.forEach($scope.boxesData,function(box){
+					if(keepgoing){
+						if(box.hostName === form.hostName.$modelValue){
+							form.hostName.$setValidity('alreadyExists',false);
+							keepgoing = false;
+						}else{
+							form.hostName.$setValidity('alreadyExists',true);				
+						
 						}	
 					}
 				});

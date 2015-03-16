@@ -13,7 +13,9 @@
 				<div class="col-md-4 text-center">
 					<div class="tab-content">
 						<div class="editIcon tab-pane fade" id="boxEdit">
-							<a ng-click="editActiveBox()"  ng-hide="activeVM === null">
+
+							<a ng-click="editActiveBox()"  ng-hide="activeVM === null ">
+
 								<span ng-hide="$root.expandedCtrlBar">
 									<i class="fa fa-edit"></i>
 								</span>
@@ -35,7 +37,8 @@
 
 					<div class="tab-content">
 						<div class="trashIcon tab-pane fade" id="boxTrash">
-							<a class="pull-right" ng-click="deleteActiveBox()" ng-hide="activeVM === null">
+
+							<a class="pull-right" ng-click="deleteActiveBox()" ng-hide="activeVM === null || activeVM.isPuppetMaster">
 								<span ng-hide="$root.expandedCtrlBar">
 									<i class="fa fa-trash-o"></i>
 								</span>
@@ -183,8 +186,12 @@
 						              <input name="hostName" 
 						              		 type="text"
 											 ng-model="quickBox.hostName"
-											 class="form-control"
+											 class="form-control"  ng-change="checkValidity.hostName(quickBoxForm)"
 											 required/>
+											 <div ng-messages="quickBoxForm.hostName.$error" >
+								        	<div ng-message="alreadyExists" class="errorMessage">This Host Name is already in use</div>
+								        	
+						            	</div>
 						            </div>
 						            <div class="boxConfig">	<span class="boxConfigTitles">Box Type<sup>*</sup></span>
 									  <input name="boxType"

@@ -16,6 +16,7 @@
 package com.boxupp.vagrant;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.boxupp.responseBeans.VagrantStatus;
 import com.boxupp.ws.OutputConsole;
@@ -29,6 +30,12 @@ public class VagrantCommandProcessor {
 		StringBuffer cmdOutput;
 		cmdOutput = shellExec.checkVagrantStatusCMD("vagrant","status");
 		return shellParser.parseVagrantStatusCMD(cmdOutput);
+	}
+	public List<VagrantStatus> checkAllMachineStatus(String location){
+		shellExec.setCMDExecDir(location);
+		StringBuffer cmdOutput;
+		cmdOutput = shellExec.checkVagrantStatusCMD("vagrant","status");
+		return shellParser.parseVagrantStatus(cmdOutput);
 	}
 	
 	public VagrantStatus checkMachineStatus(String location, String vagrantID){

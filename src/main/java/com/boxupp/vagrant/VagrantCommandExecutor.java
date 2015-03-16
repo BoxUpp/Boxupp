@@ -99,9 +99,7 @@ public class VagrantCommandExecutor {
 			console.pushOutput(cmdExecDir + ">" + vagrantCommand.toString());
 			Integer commandLength = vagrantCommand.toString().split(" ").length;
 			String vagrantID = vagrantCommand.toString().split(" ")[commandLength -1].equalsIgnoreCase("-f")? vagrantCommand.toString().split(" ")[commandLength -2]:vagrantCommand.toString().split(" ")[commandLength -1];
-			File logdir = new File(Utilities.getInstance().fetchActiveProjectDirectory(userID)+
-					OSProperties.getInstance().getOSFileSeparator()+
-					OSProperties.getInstance().getLogDirName());
+			File logdir = new File(Utilities.getInstance().fetchActiveProjectDirectory(userID)+OSProperties.getInstance().getOSFileSeparator()+OSProperties.getInstance().getLogDirName());
 			if(!logdir.exists()){
 				logdir.mkdir();
 			}
@@ -116,6 +114,7 @@ public class VagrantCommandExecutor {
 				BufferedWriter bw = new BufferedWriter(fw);
 				while((data = reader.readLine())!=null){
 					bw.write(data);
+					bw.append(System.getProperty("line.separator"));
 					console.pushOutput(data);
 				}
 				bw.close();
@@ -136,6 +135,7 @@ public class VagrantCommandExecutor {
 //			if(exitCode != 0){
 				while((data = errReader.readLine())!=null){
 					bw.write(data);
+					bw.append(System.getProperty("line.separator"));
 					console.pushError(data);
 				}
 				bw.close();
@@ -204,11 +204,13 @@ public class VagrantCommandExecutor {
 			String data;
 			while((data = reader.readLine())!=null){
 				commandOutput.append(data);
+				commandOutput.append(System.getProperty("line.separator"));
 			}
 			int exitCode = proc.waitFor();
 			if(exitCode != 0){
 				while((data = errReader.readLine())!=null){
 					commandOutput.append(data);
+					commandOutput.append(System.getProperty("line.separator"));
 				}
 			}
 		}catch(IOException e){

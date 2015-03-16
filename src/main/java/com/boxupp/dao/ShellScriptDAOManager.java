@@ -110,6 +110,18 @@ public class ShellScriptDAOManager implements DAOImplInterface {
 	}
 
 	
+	/*@Override
+	public <E> List<E> readAllDB() {
+		List<ShellScriptBean> shellScriptsList = null;
+		try{
+			shellScriptsList = shellScriptDao.queryForAll();
+		}catch(SQLException e){
+			logger.error("Error querying the shell script list from DB : " + e.getMessage());
+		}
+		return (List<E>) shellScriptsList;
+		
+	}
+*/
 	@Override
 	public StatusBean delete(String shellScriptID) {
 		StatusBean statusBean = new StatusBean();
@@ -117,7 +129,7 @@ public class ShellScriptDAOManager implements DAOImplInterface {
 			ShellScriptBean scriptBean = shellScriptDao.queryForId(Integer.parseInt(shellScriptID));
 			scriptBean.setIsDisabled(true);
 			shellScriptDao.update(scriptBean);
-			ProjectBean project = shellScriptMappingDao.queryBuilder().where().eq(ShellScriptMapping.MACHINE_ID_FIELD_NAME, shellScriptDao.queryForId(Integer.parseInt(shellScriptID))).queryForFirst().getProject();
+			ProjectBean project = shellScriptMappingDao.queryBuilder().where().eq(ShellScriptMapping.SCRIPT_ID_FIELD_NAME, shellScriptDao.queryForId(Integer.parseInt(shellScriptID))).queryForFirst().getProject();
 			Integer userID = UserDAOManager.getInstance().userProjectMappingDao.queryBuilder().where().eq(UserProjectMapping.PROJECT_ID_FIELD_NAME, project).queryForFirst().getUser().getUserID();
 			/*List<ShellScriptMapping> shellscriptMappping = shellScriptMappingDao.queryForEq(ShellScriptMapping.SCRIPT_ID_FIELD_NAME, Integer.parseInt(shellScriptID));
 				for(ShellScriptMapping shellScript : shellscriptMappping){
@@ -164,7 +176,71 @@ public class ShellScriptDAOManager implements DAOImplInterface {
 		return (List<E>)shellScriptList;
 	}
 
-		private PreparedQuery<ShellScriptBean> makeQueryForScriptsOfProject() throws SQLException {
+	/*public StatusBean linkScriptMachine(JsonNode shellScriptMapping) {
+		StatusBean statusBean =   new StatusBean();
+		try {
+			ShellScriptBean shellScript =  shellScriptDao.queryForId(Integer.parseInt(shellScriptMapping.get("scriptID").toString()));
+			ProjectBean project = ProjectDAOManager.getInstance().projectDao.queryForId(Integer.parseInt(shellScriptMapping.get("projectID").toString()));
+			MachineConfigurationBean machineConfig = MachineConfigDAOManager.getInstance().machineConfigDao.queryForId(Integer.parseInt(shellScriptMapping.get("machineID").toString()));
+			shellScriptMappingDao.updateBuilder().updateColumnValue(ShellScriptMapping.MACHINE_ID_FIELD_NAME, machineConfig).where().eq(ShellScriptMapping.PROJECT_ID_FIELD_NAME, project).and().eq(ShellScriptMapping.SCRIPT_ID_FIELD_NAME, shellScript);
+
+		} catch (NumberFormatException e) {
+			statusBean.setStatusCode(1);
+			statusBean.setStatusMessage("Error saving machine MApping with script : "+e.getMessage());
+			e.printStackTrace();
+		} catch (SQLException e) {
+			statusBean.setStatusCode(1);
+			statusBean.setStatusMessage("Error saving machine MApping with script : "+e.getMessage());
+			e.printStackTrace();
+		}
+		statusBean.setStatusCode(0);
+		statusBean.setStatusMessage("Machine MApping with  Shell script saved successfully");
+		
+		return statusBean;
+		
+	}
+	
+	public StatusBean deLinkScriptMachine(JsonNode shellScriptMapping) {
+		StatusBean statusBean =   new StatusBean();
+		try {
+			ShellScriptBean shellScript =  shellScriptDao.queryForId(Integer.parseInt(shellScriptMapping.get("scriptID").toString()));
+			ProjectBean project = ProjectDAOManager.getInstance().projectDao.queryForId(Integer.parseInt(shellScriptMapping.get("projectID").toString()));
+			MachineConfigurationBean machineConfig = MachineConfigDAOManager.getInstance().machineConfigDao.queryForId(Integer.parseInt(shellScriptMapping.get("machineID").toString()));
+			shellScriptMappingDao.updateBuilder().updateColumnValue(ShellScriptMapping.MACHINE_ID_FIELD_NAME, null).where().eq(ShellScriptMapping.PROJECT_ID_FIELD_NAME, project)
+			.and().eq(ShellScriptMapping.SCRIPT_ID_FIELD_NAME, shellScript)
+			.and().eq(ShellScriptMapping.MACHINE_ID_FIELD_NAME, machineConfig);
+		} catch (NumberFormatException e) {
+			statusBean.setStatusCode(1);
+			statusBean.setStatusMessage("Error in dLinking machine  with script : "+e.getMessage());
+			e.printStackTrace();
+		} catch (SQLException e) {
+			statusBean.setStatusCode(1);
+			statusBean.setStatusMessage("Error in dLinking machine with script : "+e.getMessage());
+			e.printStackTrace();
+		}
+		statusBean.setStatusCode(0);
+		statusBean.setStatusMessage("Machine MApping with  Shell script saved successfully");
+		
+		return statusBean;
+		
+	}*/
+	/*public <E> List<E> retireveScriptsForBoxes(String machineID) {
+		List<ShellScriptBean> shellScriptList = new ArrayList<ShellScriptBean>();
+		try {
+		if (queryForScriptsOfbox == null) {
+			queryForScriptsOfbox = makeQueryForScriptsOfbox();
+		}
+		
+		queryForScriptsOfbox.setArgumentHolderValue(0, MachineConfigDAOManager.getInstance().machineConfigDao.queryForId(Integer.parseInt(machineID)));
+		shellScriptList = shellScriptDao.query(queryForScriptsOfbox);
+		} catch (NumberFormatException e) {
+			logger.error("Error in retireving scripts for box: "+e.getMessage());
+		} catch (SQLException e) {
+			logger.error("Error in retireving scripts for box: "+e.getMessage());
+		}
+		return (List<E>)shellScriptList;
+	}*/
+	private PreparedQuery<ShellScriptBean> makeQueryForScriptsOfProject() throws SQLException {
 		
 		QueryBuilder<ShellScriptMapping, Integer> scriptProjectQb = shellScriptMappingDao.queryBuilder();
 		// just select the post-id field
@@ -179,6 +255,23 @@ public class ShellScriptDAOManager implements DAOImplInterface {
 		return shellScriptQb.prepare();
 	}
 
+	
+	/*private PreparedQuery<ShellScriptBean> makeQueryForScriptsOfbox() throws SQLException {
+
+		QueryBuilder<ShellScriptMapping, Integer> scriptProjectQb = shellScriptMappingDao.queryBuilder();
+		// just select the post-id field
+		scriptProjectQb.selectColumns(ShellScriptMapping.SCRIPT_ID_FIELD_NAME);
+		SelectArg projectSelectArg = new SelectArg();
+		// you could also just pass in user1 here
+		scriptProjectQb.where().eq(ShellScriptMapping.MACHINE_ID_FIELD_NAME, projectSelectArg);
+	
+		// build our outer query for Post objects
+		QueryBuilder<ShellScriptBean, Integer> shellScriptQb = shellScriptDao.queryBuilder();
+		// where the id matches in the post-id from the inner query
+		shellScriptQb.where().in(ShellScriptBean.ID_FIELD_NAME, scriptProjectQb);
+		return shellScriptQb.prepare();
+	}
+*/
 	public StatusBean updateScriptMapping(JsonNode  shellScriptMapping) {
 		StatusBean statusBean =   new StatusBean();
 		Integer projectID = Integer.parseInt(shellScriptMapping.get("projectID").getTextValue());

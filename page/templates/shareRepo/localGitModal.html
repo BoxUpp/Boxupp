@@ -1,0 +1,97 @@
+<div class="modal fade" id="localGitModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" ng-controller="localGitController">
+  <div class="modal-dialog">
+    <div class="modal-content" >
+      
+      <div class="modal-header">
+        <h4 class="modal-title">Remote Repo Share</h4>
+      </div>
+      <div class="error" ng-show="loginValid" ng-init="loginValid=false">
+         Invalid Username or Password.
+      </div>
+      <div class="modal-body">
+        <div class="boxConfigs">
+            <div id="gitConfigContent" class="tab-content" style="position:relative;">
+              <form name="githubForm">
+                 <div class="boxConfig" ng-hide="fetchBranchListSuccess"> 
+                          <span class="boxConfigTitles">
+                            Remote Repo URI<sup>*</sup>
+                          </span>
+                            <input name="remoteURI"
+                                  ng-model="localGitConfig.remoteRepoURI"
+                                  type="text" 
+                                  class="form-control" 
+                                  placeholder = "Enter Remote Repo URI"
+                                   popover="URI Example username@hostName:/(git repo path on remote server)" popover-trigger="focus" popover-placement="bottom" required/>
+
+                  </div>
+                  <div class="boxConfig" ng-hide="fetchBranchListSuccess"> 
+                          <span class="boxConfigTitles">
+                            Password<sup>*</sup>
+                          </span>
+                            <input name="remotePassword" 
+                                  ng-model="localGitConfig.password"
+                                  type="password" 
+                                  class="form-control"   
+                                  placeholder="Enter Remote server account password" required                          
+                                  />
+                  </div>
+                             
+                  <div class="boxConfig" ng-show="fetchBranchListSuccess"> 
+                          <span class="boxConfigTitles">
+                            Branch List
+                          </span>
+                            <select name="branchList"
+                                    ng-model="localGitConfig.repoBranch"
+                                    ng-change="branchValid = true"
+                                    class="form-control"
+                                    ng-options="branch as branch for branch in localGitConfig.gitBranchList">
+                                    <option value="">Choose a branch</option>
+                            </select>
+
+                  </div>
+                  <div class="boxConfig" ng-show="fetchBranchListSuccess"> 
+                          <span class="boxConfigTitles">
+                            Commit Path
+                          </span>
+                            <input name="gitPath" 
+                                  ng-model="localGitConfig.path"
+                                  type="text" 
+                                  class="form-control"   
+                                  placeholder="Enter path on remote repo" 
+                                  required                                    
+                            />
+                  </div>
+                  <div class="boxConfig" ng-show="fetchBranchListSuccess"> 
+                          <span class="boxConfigTitles">
+                            Comment
+                          </span>
+                            <input name="gitComment" 
+                                  ng-model="localGitConfig.comment"
+                                  type="text" 
+                                  class="form-control"
+                                  required                                    
+                            />
+                  </div>
+                      
+              </form>
+                  <!--<div class="formLoader" ng-show="loaderValid"><img  src="img/formLoader.GIF" /></div>-->
+                  
+            </div>
+        </div>
+        <div class="statusMessage text-center" ng-hide="checkbranchList" style="color:red;"><span>{{statusText}}</span></div>
+        <div class="statusLoader text-center" ng-show="checkbranchList"><span><i class="fa fa-refresh fa-spin"></i></span></div>
+
+
+        <!-- /. modal-body -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal" ng-click="resetFlags()">Close</button>
+        <button class="btn btn-primary btn-sm" ng-click="getRemoteBranchList();" ng-hide="fetchBranchListSuccess">{{buttonText}}</button>
+        <button type="button" class="btn btn-primary gitCommit btn-sm" ng-show="fetchBranchListSuccess" ng-click="commitToRemoteRepo()">Commit</button>
+        
+      </div>
+    </div>
+    <!-- /.modal-content --> 
+  </div>
+  <!-- /.modal-dialog --> 
+</div>

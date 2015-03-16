@@ -48,6 +48,14 @@
 		    								<option value="" >Select a provider</option>
 										</select>
 					            	</div>
+
+					            	<div class="boxConfig col-sm-10"> 
+					            		<div class="boxConfigTitles">Select a provisioner type for your workspace<sup>*</sup></div>
+						            	<select name="provisionerNames" ng-model="newProject.provisionerType" ng-options=" provisionerName as provisionerName for provisionerName in provisionTypes" class="form-control">
+		    								<option value="" >Select a provisioner</option>
+										</select>
+					            	</div>
+
 			        			</div>
 			        		</div>
 						</form>

@@ -65,6 +65,18 @@ public class PortMappingDAOManager {
 			statusBean.setStatusMessage("Error in creating forwarded port :"+ e.getMessage());
 		}
 	
+//		List<ForwardedPortsBean>forwordedPorts  = (List<ForwardedPortsBean>) portforwarded.fromJson(portForwardData.toString(), ForwardedPortsBean.class);
+//		try {
+//			for(ForwardedPortsBean forwardedPort :forwordedPorts){
+//				forwardedPort.setMachineConfig(machineConfig);
+//				forwardedPortDao.create(forwardedPort);
+//			}
+//		} catch (SQLException e) {
+//			logger.error("Error creating a new forwarded port mapping : " + e.getMessage());
+//			statusBean.setStatusCode(1);
+//			statusBean.setStatusMessage("Error in creating forwarded port :"+ e.getMessage());
+//
+//		}
 		statusBean.setStatusCode(0);
 		statusBean.setStatusMessage("Forwarded port create successfully");
 		return statusBean;
