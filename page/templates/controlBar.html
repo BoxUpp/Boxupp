@@ -4,7 +4,7 @@
 			<div class="row">
 				
 				<div class="col-md-4">
-					<a data-target="#" class="pull-left" style="font-size:26px; color:#FFF;" ng-click="$root.expandedCtrlBar = true;">
+					<a data-target="#" class="pull-left" style="font-size:26px; color:#FFF;" ng-click="$root.expandedCtrlBar = true">
 						<span ng-hide="$root.expandedCtrlBar">
 							<i class="fa fa-plus"></i>
 						</span>
@@ -35,7 +35,7 @@
 
 					<div class="tab-content">
 						<div class="trashIcon tab-pane fade" id="boxTrash">
-							<a class="pull-right" ng-click="deleteActiveBox()" ng-hide="activeVM === null">
+							<a class="pull-right" ng-click="deleteActiveBox()" ng-init="disableDeleteButton = false" ng-hide="activeVM === null">
 								<span ng-hide="$root.expandedCtrlBar">
 									<i class="fa fa-trash-o"></i>
 								</span>
@@ -109,9 +109,9 @@
 								</li>
 							</ul>
 						</div>
-						<div class="col-md-3 tab-content ctrl-bar-sec-nav">				
+						<div  class="col-md-3 tab-content ctrl-bar-sec-nav">				
 							<div class="tab-pane fade active in" id="ctrl-bar-box-sec-nav">
-								<ul class="nav nav-pills nav-stacked ctrl-bar-sec-list">
+								<ul  id="step7" class="nav nav-pills nav-stacked ctrl-bar-sec-list">
 									<li>
 										<a data-target="#box-quick" role="tab" data-toggle="tab">
 											<div class="main-nav-icon"><i class="fa fa-flash"></i></div>
@@ -186,13 +186,22 @@
 											 class="form-control"
 											 required/>
 						            </div>
-						            <div class="boxConfig">	<span class="boxConfigTitles">Box Type<sup>*</sup></span>
+						          	<div class="boxConfig">	<span class="boxConfigTitles">Box Type<sup>*</sup></span>
+									 <div class="input-group">
 									  <input name="boxType"
 											 type="text"
 											 ng-model="quickBox.boxType" 
 											 class="form-control"
-											 required/>
+											 required/>						
+										<span class="input-group-addon">
+										 <a data-toggle="modal" data-target="#availableBoxesModal" ng-click="quickBoxSearch(true)" role="tab" data-toggle="tab">
+										        <i class="fa fa-search"></i>
+										 </a>
+										</span>
+										</div>
 									</div>
+									
+							
 									<div class="boxConfig"> <span class="boxConfigTitles">Box URL<sup>*</sup></span>
 						              <input name="boxUrl" 
 											 type="url" 
@@ -243,4 +252,5 @@
 
 	<div ng-include="'templates/modals/moduleModal.html'"></div>
 	
+	<div ng-include="'templates/modals/availableBoxesModal.html'"></div>	
 </div>

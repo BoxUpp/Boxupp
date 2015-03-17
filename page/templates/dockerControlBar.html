@@ -35,7 +35,7 @@
 
 					<div class="tab-content">
 						<div class="trashIcon tab-pane fade" id="boxTrash">
-							<a class="pull-right" ng-click="deleteActiveBox()" ng-hide="activeVM === null">
+							<a class="pull-right" ng-click="deleteActiveBox()" ng-init="disableDeleteButton = false" ng-hide="activeVM === null">
 								<span ng-hide ="$root.expandedCtrlBar">
 									<i class="fa fa-trash-o"></i>
 								</span>
@@ -112,7 +112,7 @@
 						</div>
 						<div class="col-md-3 tab-content ctrl-bar-sec-nav">				
 							<div class="tab-pane fade active in" id="ctrl-bar-box-sec-nav">
-								<ul class="nav nav-pills nav-stacked ctrl-bar-sec-list">
+								<ul id="step7" class="nav nav-pills nav-stacked ctrl-bar-sec-list">
 									<li>
 										<a data-target="#box-quick" role="tab" data-toggle="tab">
 											<div class="main-nav-icon"><i class="fa fa-flash"></i></div>

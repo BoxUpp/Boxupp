@@ -49,11 +49,18 @@
 												<span class="boxConfigTitles">
 													Box Type<sup>*</sup>
 												</span>
+											 <div class="input-group">
 												<input 	name="boxType"
 														ng-model="rawBox.boxType" 
 														type="text"
 														class="form-control"
 														required>
+												<span class="input-group-addon">
+										 			<a data-toggle="modal" data-target="#availableBoxesModal" ng-click="quickBoxSearch(false)" role="tab" data-toggle="tab">
+										        	<i class="fa fa-search"></i>
+										 			</a>
+												</span>
+											</div>
 											</div>
 											<div class="boxConfig"> 
 												<span class="boxConfigTitles">

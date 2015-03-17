@@ -14,7 +14,7 @@
  *  limitations under the License.
  *******************************************************************************/
 
-angular.module('boxuppApp').controller('vboxController',function($scope,$interval,$q,$http,$rootScope,$routeParams,$filter,$timeout,MachineConfig,ResourcesData,vagrantStatus,executeCommand,retrieveMappings,puppetModule,miscUtil,shellScript,provider,User,$location,puppetModuleResource, boxFunctionality, loggerFunctionality){
+angular.module('boxuppApp').controller('vboxController',function($scope,$interval,$q,$http,$rootScope,$routeParams,$filter,$timeout,MachineConfig,ResourcesData,vagrantStatus,executeCommand,retrieveMappings,puppetModule,miscUtil,shellScript,provider,User,$location,puppetModuleResource, boxFunctionality, loggerFunctionality,BoxUtilities,Notification){
 
 	$scope.projectData = {
 		boxesState : {
@@ -389,20 +389,52 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		}
 		return $scope.containerData;
 	}
-	$scope.deleteActiveBox = function(){
-		alert(" Are you sure you want to remove this box.");
-		MachineConfig.delete({id:$scope.activeVM.machineID},function(){			
-			var boxCounter = 0;
+	/*$scope.deleteActiveBox = function(){
+		//$scope.disableDeleteButton=true;
+		if(!$scope.disableDeleteButton){
+			$scope.disableDeleteButton= true;
+			alert(" Are you sure you want to remove this box.");
+			MachineConfig.delete({id:$scope.activeVM.machineID},function(){			
+				var boxCounter = 0;
 
-			angular.forEach($scope.boxesData,function(box){
-				if(box.machineID === $scope.activeVM.machineID){
-					$scope.boxesData.splice(boxCounter,1);
-				}
-				boxCounter++;
+				angular.forEach($scope.boxesData,function(box){
+					if(box.machineID === $scope.activeVM.machineID){
+						$scope.boxesData.splice(boxCounter,1);
+					}
+					boxCounter++;
+				});
+				alert("here");
+				$scope.activeVM = null;
+				$scope.disableDeleteButton= false;
 			});
-			$scope.activeVM = null;
-		});
+		}
+		/*$scope.machine = new MachineConfig({id : $scope.activeVM.machineID },function(){
+			$scope.machine.$delete(function(){
+				alert('Machine deleted');
+			});
+		});*/
+/*	}*/
+	$scope.deleteActiveBox = function(){
+		if(!$scope.disableDeleteButton){
+			$scope.disableDeleteButton= true;
+			alert(" Are you sure you want to remove this box.");
+			var currentMachineID=$scope.activeVM.machineID;
+			MachineConfig.delete({id:$scope.activeVM.machineID},function(){			
+				var boxCounter = 0;
+				angular.forEach($scope.boxesData,function(box){
+					if(box.machineID === currentMachineID){
+						$scope.boxesData.splice(boxCounter,1);
+					}
+					boxCounter++;
+				});
+				Notification.success('Box \''+$scope.activeVM.vagrantID.toUpperCase()+'\' deleted successfully');
+				$scope.activeVM = null;
+				$scope.disableDeleteButton= false;
 
+			});
+		}else{
+			alert('cannot be deleted');
+		}
 		/*$scope.machine = new MachineConfig({id : $scope.activeVM.machineID },function(){
 			$scope.machine.$delete(function(){
 				alert('Machine deleted');
@@ -419,7 +451,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 				}
 				scriptCounter++;
 			});
-
+			Notification.success('Script \''+$scope.activeScript.scriptName.toUpperCase()+'\' deleted successfully.');
 			$scope.activeScript = null;
 		});
 	}
@@ -433,7 +465,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 				}
 				moduleCounter++;
 			});
-
+			Notification.success('Module \''+$scope.activeModule.moduleName+'\' deleted successfully.');
 			$scope.activeModule = null;
 		});
 	}
@@ -443,6 +475,35 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		$scope.rawBox = toBeEditedBox;
 		$('#boxModal').modal('show');
 		$scope.projectData.boxesState.update = true;
+	}
+	
+//	fetch boxes from database
+	$scope.fetchAvailabeBoxes = function(){
+		BoxUtilities.getAvailableBoxesList().then(function(data){
+			if(data!=""){
+				$scope.availableBoxes =data;
+			}
+			else{
+				$scope.availableBoxes=availableBoxesListBackUp;
+			}
+		});
+	}
+
+	$scope.updateBoxUrl = function(){
+		var string=this.box.boxName;
+		string=string.replace(/[^a-zA-Z0-9.]/g, " ");
+		if(quickBoxSearch)
+		{
+			$scope.quickBox.boxType=string.substring(0, 10);
+			$scope.quickBox.boxUrl=this.box.boxUrl;}
+		else{
+			$scope.rawBox.boxType=string.substring(0, 10);
+			$scope.rawBox.boxUrl=this.box.boxUrl;
+		}
+	}
+	var quickBoxSearch;
+	$scope.quickBoxSearch= function(flag){
+		quickBoxSearch=flag;
 	}
 
 	$scope.editActiveScript = function(){
@@ -467,6 +528,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 				});
 			});
 		});
+		Notification.success('Box updated successfully');
 	}
 
 	$scope.commitBoxChanges = function(box){
@@ -517,6 +579,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 				});
 			});
 		});
+		Notification.success('Script updated successfully');
 	}
 
 	$scope.triggerScriptChangeFlag = function(script){
@@ -564,9 +627,9 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		});
 		$scope.convertModuleMappingStructureForGraph($scope.moduleMappingData);
 		$("#moduleMapping").empty();
-		if($scope.moduleMappingTree.children.length != 0 ){
-			$scope.moduleMapping = new ModuleMapping($scope.moduleMappingTree );
-		}
+		//if($scope.moduleMappingTree.children.length != 0 ){
+			$scope.moduleMapping = new ModuleMapping($scope.moduleMappingTree,$scope.mappingAllBoxesTree);
+		//}
 		
 	}
 	$scope.convertModuleMappingStructureForGraph = function(mappings){
@@ -580,6 +643,8 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		});
 		
 		$scope.moduleMappingTree.children = machineList;
+		$scope.mappingAllBoxesTree={"name": $scope.activeModule.moduleName,"children":[]};
+		$scope.mappingAllBoxesTree.children=$scope.boxesData;
 		
 	}
 	$scope.selectScript = function(script){		
@@ -590,10 +655,9 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		});
 		$scope.convertScriptMappingStructureForGraph($scope.scriptMappingData);
 		$("#scriptMapping").empty();
-		if($scope.scriptMappingTree.children.length != 0 ){
-
-			$scope.scriptMapping = new ScriptMapping($scope.scriptMappingTree );
-		}
+		//if($scope.scriptMappingTree.children.length != 0 ){
+			$scope.scriptMapping = new ScriptMapping($scope.scriptMappingTree,$scope.mappingAllBoxesTree);
+		//}
 	}
 
 	$scope.listOfSSHImages=[
@@ -717,6 +781,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 			$scope.shellProvMappings = $scope.convertScriptMappingsStructure(mappings);
 		});
 	}
+	$scope.mappingAllBoxesTree={};
 	$scope.convertScriptMappingStructureForGraph = function(mappings){
 		$scope.scriptMappingTree ={};
 		$scope.scriptMappingTree = {"name": $scope.activeScript.scriptName,"children":[]};
@@ -726,9 +791,9 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 				machineList.push(map.machineConfig);
 			}
 		});
-		
 		$scope.scriptMappingTree.children = machineList;
-		
+		$scope.mappingAllBoxesTree={"name": $scope.activeScript.scriptName,"children":[]};
+		$scope.mappingAllBoxesTree.children=$scope.boxesData;
 	}
 	$scope.convertScriptMappingsStructure = function(mappings){
 		var newMappings = {};
@@ -774,6 +839,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 	$scope.markActiveProject();
 	$scope.fetchShellScriptMappings();
 	$scope.fetchPuppetMappings();
+	$scope.fetchAvailabeBoxes();
 	
 	/*$scope.server = {
 		connect : function() {
@@ -890,6 +956,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		boxuppIntro.setOption("showStepNumbers", false);
 		var targetElement = $("div.provisionSec");
 		boxuppIntro.onbeforechange(function(targetElement) {  
+			
 			var nextStep = $(targetElement).data('step');
 			if(nextStep === 1){
 				$('#vagrant').click();
@@ -1055,6 +1122,7 @@ $('#datepicker-example7-end').Zebra_DatePicker({
 		  }).
 		  error(function(data, status, headers, config) {
 			console.log('Problem in fetching information for box URL. Probably, internet is not working');
+			Notification.error("Problem in fetching information for box URL. Probably, internet is not working");
 		  });
 	}
 	

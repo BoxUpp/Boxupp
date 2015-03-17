@@ -17,7 +17,6 @@ package com.boxupp.resources;
 
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -57,8 +56,7 @@ public class User {
 	@Path("/getProjects/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<ProjectBean> getAllProjectsList(@PathParam("id") String userId){
-		return ProjectDAOManager.getInstance().retireveProjectsForUser(userId);
-	}
+		return ProjectDAOManager.getInstance().retireveProjectsForUser(userId);	}
 	
 	@GET
 	@Path("/idCheck/{id}")

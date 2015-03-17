@@ -185,7 +185,13 @@
 		<artifactId>jetty-servlets</artifactId>
 		<version>9.1.4.v20140401</version>
 	</dependency>
-            
+	
+	<!-- jsoup HTML parser library @ http://jsoup.org/ -->
+    <dependency>
+		<groupId>org.jsoup</groupId>
+		<artifactId>jsoup</artifactId>
+		<version>1.8.1</version>
+	</dependency>        
             
 
   </dependencies>
@@ -345,8 +351,8 @@
           <filtering>true</filtering>
            <excludes>
              <exclude>config.properties</exclude>
-             <exclude>config.xml</exclude>
-             <exclude>LICENSE.txt</exclude>
+              <!-- <exclude>config.xml</exclude>-->
+              <exclude>LICENSE.txt</exclude>
              <exclude>log4j2.xml</exclude>
              <exclude>README.txt</exclude>
            </excludes>

@@ -138,6 +138,10 @@ div.mainNavElements {
       color: #FFFFFF; }
       div.mainNavElements .mainNavList li a:hover .main-nav-icon i {
         color: inherit; }
+    /*  div.mainNavElements .mainNavList div > li a{
+          display: block;
+    	  padding: 10px 15px;position: relative;}
+      */  
 
 div.secondaryNavElements {
   background: grey;
@@ -188,6 +192,8 @@ div.secondaryNavElements {
     cursor: pointer; }
   div.secondaryNavElements .secondaryNavList li div.arrow {
     display: none; }
+    
+    
 
 div.boxConfigs {
   margin-left: 20px;

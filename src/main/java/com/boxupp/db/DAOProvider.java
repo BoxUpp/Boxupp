@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.boxupp.db.beans.AvailableBoxesBean;
 import com.boxupp.db.beans.MachineConfigurationBean;
 import com.boxupp.db.beans.MachineProjectMapping;
 import com.boxupp.db.beans.ProjectBean;
@@ -28,7 +29,6 @@ import com.boxupp.db.beans.ShellScriptBean;
 import com.boxupp.db.beans.ShellScriptMapping;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.table.TableUtils;
 
 public class DAOProvider {
 	
@@ -114,4 +114,14 @@ public class DAOProvider {
 		}
 		return shellScriptMappingDao;
 	}
+	 public Dao<AvailableBoxesBean,Integer> fetchAvailableBoxesDao(){
+		Dao<AvailableBoxesBean, Integer> availableBoxesDao = null;
+		try{
+			availableBoxesDao = DaoManager.createDao(DBConnectionManager.getInstance().fetchDBConnection(), AvailableBoxesBean.class);
+		}catch(SQLException e){
+			logger.error("Error initializing DAO access object for AvailableBoxesBean.class : "+e.getMessage());
+		}
+		return availableBoxesDao;
+	} 
+	 
 }

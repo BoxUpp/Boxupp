@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *******************************************************************************/
-angular.module('boxuppApp').controller('ctrlBarController',function($scope,shellScript,$routeParams,miscUtil,MachineConfig){
+angular.module('boxuppApp').controller('ctrlBarController',function($scope,shellScript,$routeParams,miscUtil,MachineConfig,Notification){
 
 	
 
@@ -26,10 +26,11 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		shellScript.save(newShellScriptData,function(data){
 			if(data.statusCode === 0){
 				console.info('Shell Script has been saved successfully');
+				Notification.success('Shell Script has been saved successfully');
 				$scope.shellScripts.push(data.beanData);
 				newShellScriptData.scriptName = "";
 				newShellScriptData.scriptContent = "";
-				$scope.rawScriptForm.$setPristine();
+				//$scope.rawScriptForm.$setPristine();
 			}
 			
 		});
@@ -87,6 +88,7 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 		$scope.quickBoxForm.$setPristine();
 		$scope.quickBoxCommitLoader = false;
 		$scope.modals.close.box();
+		Notification.success('Box created successfully');
 	}
 	$scope.createContainerBoxes = function(boxData){
 		$('#boxModal').modal('hide');
@@ -129,7 +131,9 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 			$scope.quickBoxForm.$setPristine();
 			$scope.deployBox(data.beanData);
 		});
-		$scope.quickBoxCommitLoader = false;	
+		$scope.quickBoxCommitLoader = false;
+		Notification.success('Box created successfully');
+
 	}
 	$scope.createContainerQuickBox = function(boxData){
 		
@@ -256,6 +260,7 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 	$scope.modals = {
 		close : {
 			script : function(rawScriptForm){
+				//alert(JSON.stringify(rawScriptForm));
 				$scope.projectData.scriptsState.update = false;
 				rawScriptForm.$setPristine();
 				$scope.rawScript.scriptName = "";
@@ -290,7 +295,10 @@ angular.module('boxuppApp').controller('ctrlBarController',function($scope,shell
 				
 				$scope.containerRawBoxForm.basicSettings.$setPristine();
 				$('#boxModal').modal('hide');
-			}	
+			},
+			availableBoxes: function(){
+				$('#availableBoxesModal').modal('hide');
+			}
 		}
 	};
 
