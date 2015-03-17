@@ -53,7 +53,7 @@ angular.module('boxuppApp').factory('Notification', function(
 					var top = lastTop + (j === 0 ? 0 : verticalSpacing);
 					var right = startRight + (k * (horizontalSpacing + elWidth));
 					
-					element.css('top', top + 'px');
+					element.css('bottom', top + 'px');
 					element.css('right', right + 'px');
 					
 					lastTop = top + elHeight;

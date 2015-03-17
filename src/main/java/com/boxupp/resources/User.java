@@ -56,8 +56,7 @@ public class User {
 	@Path("/getProjects/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<ProjectBean> getAllProjectsList(@PathParam("id") String userId){
-			return ProjectDAOManager.getInstance().retireveProjectsForUser(userId);
-	}
+		return ProjectDAOManager.getInstance().retireveProjectsForUser(userId);	}
 	
 	@GET
 	@Path("/idCheck/{id}")
